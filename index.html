@@ -189,7 +189,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- STEP 1: CLIENT -->
     <div id="step-content-1">
       <div class="card">
-        <div class="card-title">Informations client</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title" style="margin:0;">Informations client</div>
+          <button class="btn btn-blue" style="padding:8px 14px;font-size:12px;" onclick="openRdvModal()">📅 Agenda Google</button>
+        </div>
         <div class="form-grid">
           <div class="form-group form-full">
             <label>Nom / Societe</label>
@@ -408,6 +411,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- ZONE IMPRESSION -->
 <div id="print-area"></div>
+
+<!-- MODAL RDV -->
+<div id="rdv-modal" class="modal-bg hidden" onclick="if(event.target===this)closeRdvModal()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin:0;">Selectionnez un RDV</div>
+      <button onclick="closeRdvModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">x</button>
+    </div>
+    <div id="rdv-content">
+      <div style="text-align:center;padding:30px;color:var(--text3);">Chargement des RDV...</div>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -981,6 +998,84 @@ function saveEmailJS(){
   localStorage.setItem('ejs_template',document.getElementById('ejs-template').value);
   localStorage.setItem('ejs_pubkey',document.getElementById('ejs-pubkey').value);
   showToast('EmailJS configure');
+}
+
+// ── RDV GOOGLE AGENDA ──────────────────────────
+function openRdvModal() {
+  document.getElementById('rdv-modal').classList.remove('hidden');
+  loadRdvs();
+}
+function closeRdvModal() {
+  document.getElementById('rdv-modal').classList.add('hidden');
+}
+async function loadRdvs() {
+  const apiKey = localStorage.getItem('la_apikey');
+  const content = document.getElementById('rdv-content');
+  if(!apiKey) {
+    content.innerHTML = '<div style="text-align:center;padding:20px;color:#e53935;font-size:13px;">Configurez votre cle API Anthropic dans Reglages pour utiliser cette fonction.</div>';
+    return;
+  }
+  content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);">Chargement des RDV...</div>';
+  try {
+    const now = new Date().toISOString();
+    const end = new Date(Date.now()+30*86400000).toISOString();
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:2000,
+        mcp_servers:[{type:'url',url:'https://calendarmcp.googleapis.com/mcp/v1',name:'gcal'}],
+        messages:[{role:'user',content:'Liste mes evenements Google Calendar entre '+now+' et '+end+'. Retourne UNIQUEMENT un tableau JSON (sans markdown): [{"summary":"...","start_datetime":"...","location":"...","description":"..."}]'}]
+      })
+    });
+    const data = await res.json();
+    const txt = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const arr = JSON.parse(clean.slice(clean.indexOf('['),clean.lastIndexOf(']')+1));
+    if(!arr.length) {
+      content.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Aucun RDV dans les 30 prochains jours.</div>';
+      return;
+    }
+    content.innerHTML = arr.map((r,i)=>`
+      <div class="cat-item" onclick="pickRdv(${i})" style="margin-bottom:8px;">
+        <div style="flex:1;">
+          <div class="cat-item-name">${escHtml(r.summary||'')}</div>
+          ${r.location?`<div class="cat-item-cat">${escHtml(r.location)}</div>`:''}
+        </div>
+        <div style="text-align:right;font-size:11px;color:var(--bleu);flex-shrink:0;">
+          ${r.start_datetime?fmtDate(r.start_datetime):''}
+        </div>
+      </div>
+    `).join('');
+    window._rdvList = arr;
+  } catch(e) {
+    content.innerHTML = '<div style="text-align:center;padding:20px;color:#e53935;font-size:13px;">Erreur: '+e.message+'</div>';
+  }
+}
+function pickRdv(i) {
+  const r = window._rdvList[i];
+  if(!r) return;
+  let nom = (r.summary||'').replace(/rdv\s*/i,'').replace(/Loire\s*Am[eé]nagement\s*\(?/i,'').replace(/\)$/,'').trim();
+  const loc = r.location||'';
+  const parts = loc.split(',').map(s=>s.trim());
+  let adresse = parts[0]||'', cp='', ville='';
+  const m = (parts[1]||'').match(/^(\d{5})\s+(.+)$/);
+  if(m){cp=m[1];ville=m[2];} else {ville=parts[1]||'';}
+  const raw = (r.description||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  const telM = raw.match(/0[67]\d{8}|0[1-9](?:[\s.-]?\d{2}){4}/);
+  const emailM = raw.match(/[\w.-]+@[\w.-]+\.\w+/);
+  const tel = telM?telM[0].replace(/[\s.-]/g,''):'';
+  const email = emailM?emailM[0]:'';
+  const desc = raw.replace(telM?telM[0]:'','').replace(emailM?emailM[0]:'','').trim().slice(0,200);
+  document.getElementById('cli-nom').value = nom;
+  document.getElementById('cli-adresse').value = adresse;
+  document.getElementById('cli-cp').value = cp;
+  document.getElementById('cli-ville').value = ville;
+  if(email) document.getElementById('cli-email').value = email;
+  if(tel) document.getElementById('cli-tel').value = tel;
+  if(desc) document.getElementById('cli-desc').value = desc;
+  closeRdvModal();
+  showToast('RDV importe: '+nom);
 }
 
 // ── UTILS ───────────────────────────────────────
