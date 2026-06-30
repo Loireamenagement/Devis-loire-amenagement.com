@@ -770,7 +770,7 @@ async function envoyerDevis() {
   const tplId=localStorage.getItem('ejs_template');
   const pubKey=localStorage.getItem('ejs_pubkey');
   if(!svcId||!tplId||!pubKey){
-    document.getElementById('send-status').innerHTML='<span style="color:#e53935;">Configurez EmailJS dans Reglages d'abord</span>';
+    document.getElementById('send-status').innerHTML='<span style="color:#e53935;">Configurez EmailJS dans Reglages avant</span>';
     return;
   }
   document.getElementById('send-status').textContent='Envoi en cours...';
