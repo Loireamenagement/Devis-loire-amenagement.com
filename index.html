@@ -257,6 +257,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- STEP 2: PRESTATIONS -->
     <div id="step-content-2" class="hidden">
+      <!-- Ajout chapitres -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title" style="margin:0;">Structure du devis</div>
+          <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="toggleChapPanel()">+ Chapitre</button>
+        </div>
+        <div id="chap-panel" class="hidden">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <input id="chap-input" type="text" placeholder="Titre du chapitre..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;">
+            <button class="btn btn-primary" style="padding:10px 14px;font-size:13px;" onclick="addChap()">Ch.</button>
+            <button class="btn" style="padding:10px 14px;font-size:13px;background:var(--vertc);color:white;" onclick="addSubChap()">Sous</button>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="font-size:11px;color:var(--text3);align-self:center;">Rapide:</span>
+            <div id="chap-quick"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Catalogue prestations -->
       <div class="card">
         <div class="card-title">Ajouter des prestations</div>
         <div class="cat-search">
@@ -269,7 +288,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="card-title">Lignes du devis</div>
         <div id="lignes-list">
           <div id="lignes-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">
-            Selectionnez des prestations ci-dessus
+            Ajoutez chapitres et prestations ci-dessus
           </div>
         </div>
         <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="addLigneManuelle()">
@@ -283,7 +302,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
 
-    <!-- STEP 3: APERCU -->
+<!-- STEP 3: APERCU -->
     <div id="step-content-3" class="hidden">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -524,6 +543,38 @@ function goStep(n) {
   document.getElementById('s-nouveau').scrollTop=0;
 }
 
+// CHAPITRES
+const CHAP_LIB = ["Installation de chantier", "Travaux préparatoires", "Démolition / Dépose", "Terrassement", "Maçonnerie / Fondations", "Terrasse", "Allée et accès", "Clôture et portail", "Jardin et plantations", "Éclairage extérieur", "Arrosage / Drainage", "Finitions", "Repli de chantier"];
+
+function toggleChapPanel() {
+  const p = document.getElementById('chap-panel');
+  p.classList.toggle('hidden');
+  if(!p.classList.contains('hidden')) {
+    // Build quick chips
+    const el = document.getElementById('chap-quick');
+    el.innerHTML = CHAP_LIB.map(c=>
+      `<span class="cat-chip" onclick="document.getElementById('chap-input').value='${c}'" style="font-size:11px;padding:3px 8px;">${c}</span>`
+    ).join('');
+    document.getElementById('chap-input').focus();
+  }
+}
+function addChap() {
+  const val = document.getElementById('chap-input').value.trim();
+  if(!val) return;
+  lignes.push({id:uid(), type:'chapter', label:val});
+  renderLignes();
+  document.getElementById('chap-input').value = '';
+  showToast('Chapitre ajoute');
+}
+function addSubChap() {
+  const val = document.getElementById('chap-input').value.trim();
+  if(!val) return;
+  lignes.push({id:uid(), type:'subchapter', label:val});
+  renderLignes();
+  document.getElementById('chap-input').value = '';
+  showToast('Sous-chapitre ajoute');
+}
+
 // ── CATALOGUE ──────────────────────────────────
 let catFilter = '';
 let catSearch = '';
@@ -614,6 +665,14 @@ function delLigne(id) {
   lignes=lignes.filter(l=>l.id!==id);
   renderLignes();
 }
+function moveLigne(id,dir) {
+  const i=lignes.findIndex(l=>l.id===id);
+  if(i<0)return;
+  const j=i+dir;
+  if(j<0||j>=lignes.length)return;
+  [lignes[i],lignes[j]]=[lignes[j],lignes[i]];
+  renderLignes();
+}
 function updLigne(id,field,val) {
   const l=lignes.find(l=>l.id===id);
   if(l){l[field]=field==='label'?val:parseFloat(val)||0;renderTotaux();}
@@ -621,10 +680,22 @@ function updLigne(id,field,val) {
 function renderLignes() {
   const el=document.getElementById('lignes-list');
   document.getElementById('lignes-empty').style.display=lignes.length?'none':'block';
-  const existing=el.querySelectorAll('.ligne-row');
+  const existing=el.querySelectorAll('.ligne-row,.ligne-chap,.ligne-subchap');
   existing.forEach(e=>e.remove());
   lignes.forEach(l=>{
     const div=document.createElement('div');
+    if(l.type==='chapter') {
+      div.className='ligne-chap';
+      div.style.cssText='background:linear-gradient(to right,rgba(45,110,62,.1),transparent);border-left:4px solid #2d6e3e;border-radius:var(--r2);padding:10px 12px;margin-bottom:4px;display:flex;align-items:center;gap:8px;';
+      div.innerHTML=`<span style="font-size:12px;">##</span><input value="${escHtml(l.label)}" onchange="updLigne('${l.id}','label',this.value)" style="flex:1;background:transparent;border:none;font-weight:700;font-size:15px;color:#1a3a2a;font-family:inherit;outline:none;"><button onclick="moveLigne('${l.id}',-1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↑</button><button onclick="moveLigne('${l.id}',1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↓</button><button onclick="delLigne('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;padding:2px 6px;">x</button>`;
+      el.appendChild(div); return;
+    }
+    if(l.type==='subchapter') {
+      div.className='ligne-subchap';
+      div.style.cssText='background:rgba(74,156,90,.06);border-left:3px solid #4a9c5a;border-radius:var(--r2);padding:8px 12px;margin-bottom:4px;margin-left:12px;display:flex;align-items:center;gap:8px;';
+      div.innerHTML=`<span style="font-size:12px;">#</span><input value="${escHtml(l.label)}" onchange="updLigne('${l.id}','label',this.value)" style="flex:1;background:transparent;border:none;font-weight:600;font-size:13px;color:#2d6e3e;font-family:inherit;outline:none;"><button onclick="moveLigne('${l.id}',-1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↑</button><button onclick="moveLigne('${l.id}',1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↓</button><button onclick="delLigne('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;padding:2px 6px;">x</button>`;
+      el.appendChild(div); return;
+    }
     div.className='ligne-row';
     div.innerHTML=`
       <div class="ligne-row-header">
@@ -731,12 +802,14 @@ function buildApercu() {
       </div>
     </div>
     ${cli.desc?`<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text2);margin-bottom:12px;font-style:italic;">${cli.desc}</div>`:''}`+
-    lignes.map(l=>`
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee;gap:8px;">
-        <div style="flex:1;"><div style="font-size:13px;">${escHtml(l.label)}</div><div style="font-size:11px;color:var(--text3);">${l.unite}</div></div>
+    lignes.map(l=>{
+      if(l.type==='chapter') return `<div style="background:rgba(45,110,62,.08);border-left:4px solid #2d6e3e;padding:8px 12px;margin:8px 0 4px;font-weight:700;font-size:14px;border-radius:4px;">${escHtml(l.label)}</div>`;
+      if(l.type==='subchapter') return `<div style="border-left:3px solid #4a9c5a;padding:6px 10px;margin:4px 0 4px 12px;font-weight:600;font-size:13px;color:#2d6e3e;">${escHtml(l.label)}</div>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee;gap:8px;">
+        <div style="flex:1;"><div style="font-size:13px;">${escHtml(l.label)}</div><div style="font-size:11px;color:var(--text3);">${l.unite||''}</div></div>
         <div style="text-align:right;flex-shrink:0;font-size:12px;color:var(--text2);">${l.qte} x ${fmt(l.prix)} E<br><b style="color:var(--text)">${fmt(l.qte*l.prix)} E</b></div>
-      </div>
-    `).join('')+`
+      </div>`;
+    }).join('')+`
     <div style="margin-top:12px;">
       <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
         <span>Total HT</span><span>${fmt(t.ht)} E</span>
