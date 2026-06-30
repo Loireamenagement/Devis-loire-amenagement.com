@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#2d6e3e">
 <title>Loire Amenagement - Devis</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="manifest" href="manifest.json">
 <style>
 :root{
@@ -1000,72 +1001,112 @@ function saveEmailJS(){
   showToast('EmailJS configure');
 }
 
-// ── RDV GOOGLE AGENDA ──────────────────────────
+// ── RDV GOOGLE AGENDA (OAuth officiel) ──────────
+const GOOGLE_CLIENT_ID = '439283325349-qkeq67cv9qjuh9olsbq19qpt1db9hu8m.apps.googleusercontent.com';
+const GCAL_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+let gAccessToken = sessionStorage.getItem('g_access_token') || null;
+let tokenClient = null;
+
+function initGoogleAuth() {
+  if(typeof google === 'undefined' || !google.accounts) { setTimeout(initGoogleAuth, 300); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: GCAL_SCOPE,
+    callback: (resp) => {
+      if(resp.access_token) {
+        gAccessToken = resp.access_token;
+        sessionStorage.setItem('g_access_token', gAccessToken);
+        fetchRdvs();
+      }
+    }
+  });
+}
+
 function openRdvModal() {
   document.getElementById('rdv-modal').classList.remove('hidden');
-  loadRdvs();
+  if(gAccessToken) {
+    fetchRdvs();
+  } else {
+    document.getElementById('rdv-content').innerHTML = `
+      <div style="text-align:center;padding:30px 10px;">
+        <div style="font-size:36px;margin-bottom:12px;">📅</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Connectez votre Google Agenda pour voir vos RDV</div>
+        <button class="btn btn-blue" onclick="connectGoogle()">Se connecter avec Google</button>
+      </div>`;
+  }
 }
 function closeRdvModal() {
   document.getElementById('rdv-modal').classList.add('hidden');
 }
-async function loadRdvs() {
-  const apiKey = localStorage.getItem('la_apikey');
+function connectGoogle() {
+  if(!tokenClient) { showToast('Initialisation en cours, reessayez'); return; }
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+async function fetchRdvs() {
   const content = document.getElementById('rdv-content');
-  if(!apiKey) {
-    content.innerHTML = '<div style="text-align:center;padding:20px;color:#e53935;font-size:13px;">Configurez votre cle API Anthropic dans Reglages pour utiliser cette fonction.</div>';
-    return;
-  }
   content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);">Chargement des RDV...</div>';
+  const now = new Date().toISOString();
+  const end = new Date(Date.now()+30*86400000).toISOString();
   try {
-    const now = new Date().toISOString();
-    const end = new Date(Date.now()+30*86400000).toISOString();
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:2000,
-        mcp_servers:[{type:'url',url:'https://calendarmcp.googleapis.com/mcp/v1',name:'gcal'}],
-        messages:[{role:'user',content:'Liste mes evenements Google Calendar entre '+now+' et '+end+'. Retourne UNIQUEMENT un tableau JSON (sans markdown): [{"summary":"...","start_datetime":"...","location":"...","description":"..."}]'}]
-      })
-    });
+    const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events?'
+      + 'timeMin='+encodeURIComponent(now)
+      + '&timeMax='+encodeURIComponent(end)
+      + '&singleEvents=true&orderBy=startTime&maxResults=25';
+    const res = await fetch(url, { headers: { 'Authorization': 'Bearer '+gAccessToken } });
+    if(res.status === 401) {
+      // Token expire, redemander
+      gAccessToken = null;
+      sessionStorage.removeItem('g_access_token');
+      content.innerHTML = `<div style="text-align:center;padding:20px;">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Session expiree</div>
+        <button class="btn btn-blue" onclick="connectGoogle()">Se reconnecter</button>
+      </div>`;
+      return;
+    }
     const data = await res.json();
-    const txt = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
-    const clean = txt.replace(/```json|```/g,'').trim();
-    const arr = JSON.parse(clean.slice(clean.indexOf('['),clean.lastIndexOf(']')+1));
-    if(!arr.length) {
+    const events = (data.items||[]).filter(e=>e.summary);
+    if(!events.length) {
       content.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Aucun RDV dans les 30 prochains jours.</div>';
       return;
     }
-    content.innerHTML = arr.map((r,i)=>`
-      <div class="cat-item" onclick="pickRdv(${i})" style="margin-bottom:8px;">
-        <div style="flex:1;">
-          <div class="cat-item-name">${escHtml(r.summary||'')}</div>
-          ${r.location?`<div class="cat-item-cat">${escHtml(r.location)}</div>`:''}
-        </div>
-        <div style="text-align:right;font-size:11px;color:var(--bleu);flex-shrink:0;">
-          ${r.start_datetime?fmtDate(r.start_datetime):''}
-        </div>
-      </div>
-    `).join('');
-    window._rdvList = arr;
+    window._rdvList = events;
+    content.innerHTML = events.map((e,i)=>{
+      const start = e.start?.dateTime || e.start?.date || '';
+      return `
+        <div class="cat-item" onclick="pickRdv(${i})" style="margin-bottom:8px;">
+          <div style="flex:1;min-width:0;">
+            <div class="cat-item-name">${escHtml(e.summary||'')}</div>
+            ${e.location?`<div class="cat-item-cat">${escHtml(e.location)}</div>`:''}
+          </div>
+          <div style="text-align:right;font-size:11px;color:var(--bleu);flex-shrink:0;">
+            ${start?fmtDate(start):''}
+          </div>
+        </div>`;
+    }).join('');
   } catch(e) {
     content.innerHTML = '<div style="text-align:center;padding:20px;color:#e53935;font-size:13px;">Erreur: '+e.message+'</div>';
   }
 }
+
 function pickRdv(i) {
-  const r = window._rdvList[i];
-  if(!r) return;
-  let nom = (r.summary||'').replace(/rdv\s*/i,'').replace(/Loire\s*Am[eé]nagement\s*\(?/i,'').replace(/\)$/,'').trim();
-  const loc = r.location||'';
+  const e = window._rdvList[i];
+  if(!e) return;
+  let nom = (e.summary||'').replace(/rdv\s*/i,'').replace(/Loire\s*Am[eé]nagement\s*\(?/i,'').replace(/\)$/,'').trim();
+  const loc = e.location||'';
   const parts = loc.split(',').map(s=>s.trim());
   let adresse = parts[0]||'', cp='', ville='';
   const m = (parts[1]||'').match(/^(\d{5})\s+(.+)$/);
   if(m){cp=m[1];ville=m[2];} else {ville=parts[1]||'';}
-  const raw = (r.description||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  const raw = (e.description||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   const telM = raw.match(/0[67]\d{8}|0[1-9](?:[\s.-]?\d{2}){4}/);
   const emailM = raw.match(/[\w.-]+@[\w.-]+\.\w+/);
   const tel = telM?telM[0].replace(/[\s.-]/g,''):'';
-  const email = emailM?emailM[0]:'';
+  let email = emailM?emailM[0]:'';
+  if(!email && e.attendees) {
+    const att = e.attendees.find(a=>a.email && !a.email.includes('loire-amenagement'));
+    if(att) email = att.email;
+  }
   const desc = raw.replace(telM?telM[0]:'','').replace(emailM?emailM[0]:'','').trim().slice(0,200);
   document.getElementById('cli-nom').value = nom;
   document.getElementById('cli-adresse').value = adresse;
@@ -1078,7 +1119,7 @@ function pickRdv(i) {
   showToast('RDV importe: '+nom);
 }
 
-// ── UTILS ───────────────────────────────────────
+// UTILS
 function fmt(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}catch(e){return d;}}
 function uid(){return Math.random().toString(36).slice(2,10).toUpperCase();}
@@ -1087,6 +1128,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // Service Worker
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+window.addEventListener('load', initGoogleAuth);
 </script>
 </body>
 </html>
