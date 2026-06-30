@@ -257,35 +257,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- STEP 2: PRESTATIONS -->
     <div id="step-content-2" class="hidden">
-      <!-- Ajout chapitres -->
+
+      <!-- CHAPITRES -->
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div class="card-title" style="margin:0;">Structure du devis</div>
-          <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="toggleChapPanel()">+ Chapitre</button>
+          <div class="card-title" style="margin:0;">1. Chapitres</div>
+          <span style="font-size:11px;color:var(--text3);">Selectionnez pour y ajouter des prestations</span>
         </div>
-        <div id="chap-panel" class="hidden">
-          <div style="display:flex;gap:8px;margin-bottom:10px;">
-            <input id="chap-input" type="text" placeholder="Titre du chapitre..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;">
-            <button class="btn btn-primary" style="padding:10px 14px;font-size:13px;" onclick="addChap()">Ch.</button>
-            <button class="btn" style="padding:10px 14px;font-size:13px;background:var(--vertc);color:white;" onclick="addSubChap()">Sous</button>
+        <div id="chap-library" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;">
+          <input id="chap-free" type="text" placeholder="Nouveau chapitre libre..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;">
+          <button class="btn btn-primary" style="padding:10px 14px;" onclick="addFreeChap()">+ Ch.</button>
+          <button class="btn" style="padding:10px 14px;background:var(--vertc);color:white;" onclick="addFreeSubChap()">+ Sous</button>
+        </div>
+      </div>
+
+      <!-- RECHERCHE PRESTATIONS -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="card-title" style="margin:0;">2. Prestations</div>
+          <div id="chap-active-badge" style="font-size:11px;background:rgba(45,110,62,.1);color:#2d6e3e;padding:3px 10px;border-radius:20px;display:none;">+ dans: <b id="chap-active-name"></b></div>
+        </div>
+        <input type="text" id="cat-search" placeholder="Rechercher une prestation..." oninput="filterCat()" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;margin-bottom:10px;">
+        <div class="cat-filters" id="cat-filters" style="margin-bottom:10px;"></div>
+        <div id="cat-list" style="max-height:280px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- FICHE PRESTATION (modale) -->
+      <div id="prest-fiche" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;">
+        <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto;">
+          <div style="width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 16px;"></div>
+          <div id="fiche-designation" style="font-size:15px;font-weight:600;margin-bottom:4px;color:var(--text);"></div>
+          <div id="fiche-cat" style="font-size:12px;color:var(--text3);margin-bottom:16px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;text-align:center;">
+            <div style="background:#f0f8f0;border-radius:var(--r2);padding:10px;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Prix min</div>
+              <div id="fiche-min" style="font-size:15px;font-weight:600;color:#2d6e3e;"></div>
+            </div>
+            <div style="background:#e8f5e9;border-radius:var(--r2);padding:10px;border:2px solid #2d6e3e;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Prix moyen</div>
+              <div id="fiche-moy" style="font-size:18px;font-weight:700;color:#2d6e3e;"></div>
+            </div>
+            <div style="background:#fff3e0;border-radius:var(--r2);padding:10px;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Prix max</div>
+              <div id="fiche-max" style="font-size:15px;font-weight:600;color:#e65100;"></div>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-            <span style="font-size:11px;color:var(--text3);align-self:center;">Rapide:</span>
-            <div id="chap-quick"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Quantite</label>
+              <input id="fiche-qte" type="number" min="0" step="0.5" value="1" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--r2);font-size:16px;text-align:center;outline:none;">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Prix unitaire HT</label>
+              <input id="fiche-prix" type="number" min="0" step="0.01" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--r2);font-size:16px;text-align:right;outline:none;">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#f5f5f5;border-radius:var(--r2);padding:10px 14px;margin-bottom:16px;">
+            <span style="font-size:13px;color:var(--text2);">Total HT</span>
+            <span id="fiche-total" style="font-size:18px;font-weight:700;color:#2d6e3e;"></span>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-secondary" style="flex:1;" onclick="closeFiche()">Annuler</button>
+            <button class="btn btn-primary" style="flex:2;" onclick="validerFiche()">Ajouter au devis</button>
           </div>
         </div>
       </div>
-      <!-- Catalogue prestations -->
+
+      <!-- LIGNES DU DEVIS -->
       <div class="card">
-        <div class="card-title">Ajouter des prestations</div>
-        <div class="cat-search">
-          <input type="text" id="cat-search" placeholder="Rechercher..." oninput="filterCat()">
-        </div>
-        <div class="cat-filters" id="cat-filters"></div>
-        <div class="cat-list" id="cat-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Lignes du devis</div>
+        <div class="card-title">3. Mon devis</div>
         <div id="lignes-list">
           <div id="lignes-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">
             Ajoutez chapitres et prestations ci-dessus
@@ -295,6 +336,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           + Prestation manuelle
         </button>
       </div>
+
       <div class="totaux" id="totaux-mini"></div>
       <div class="btn-row" style="margin-top:12px;">
         <button class="btn btn-secondary" onclick="goStep(1)">Retour</button>
@@ -504,9 +546,9 @@ function initApp() {
   document.getElementById('devis-valid').value = in15;
   // Catalogue
   buildCatFilters();
-  renderCatList('cat-list', '');
+  renderCatList('');
   buildFullCatFilters();
-  renderFullCatList('');
+  renderFullCatListFiltered('','');
   // Devis
   renderDevisList();
   // Parametres
@@ -532,6 +574,7 @@ function showScreen(name) {
 
 // ── STEPS ──────────────────────────────────────
 function goStep(n) {
+  if(n===2) { setTimeout(()=>{ buildChapLibrary(); buildCatFilters(); renderCatList(''); updateActiveChapBadge(); },50); }
   if(n===3) buildApercu();
   if(n===5) {document.getElementById('send-email').value=document.getElementById('cli-email').value;}
   for(let i=1;i<=5;i++) {
@@ -543,95 +586,155 @@ function goStep(n) {
   document.getElementById('s-nouveau').scrollTop=0;
 }
 
-// CHAPITRES
-const CHAP_LIB = ["Installation de chantier", "Travaux préparatoires", "Démolition / Dépose", "Terrassement", "Maçonnerie / Fondations", "Terrasse", "Allée et accès", "Clôture et portail", "Jardin et plantations", "Éclairage extérieur", "Arrosage / Drainage", "Finitions", "Repli de chantier"];
+// CHAPITRES & CATALOGUE
 
-function toggleChapPanel() {
-  const p = document.getElementById('chap-panel');
-  p.classList.toggle('hidden');
-  if(!p.classList.contains('hidden')) {
-    // Build quick chips
-    const el = document.getElementById('chap-quick');
-    el.innerHTML = CHAP_LIB.map(c=>
-      `<span class="cat-chip" onclick="document.getElementById('chap-input').value='${c}'" style="font-size:11px;padding:3px 8px;">${c}</span>`
-    ).join('');
-    document.getElementById('chap-input').focus();
+let activeChapId = null; // id du chapitre actif pour ajout prestation
+let ficheItem = null;    // prestation en cours de fiche
+
+// ── Chapitres ─────────────────────────────────────────────────────
+function buildChapLibrary() {
+  const el = document.getElementById('chap-library');
+  if(!el) return;
+  // Chapitres existants dans le devis + bibliothèque de base
+  const inDevis = lignes.filter(l=>l.type==='chapter').map(l=>l.label);
+  const existing = new Set(inDevis.map(s=>s.toLowerCase()));
+  // Chapitres de la base (CATALOGUE categories + chapitres CHAP_LIB)
+  const all = [...new Set([...CHAP_LIB, ...inDevis])].sort((a,b)=>a.localeCompare(b,'fr'));
+  el.innerHTML = all.map(c => {
+    const isActive = activeChapId && lignes.find(l=>l.id===activeChapId)?.label===c;
+    const isInDevis = existing.has(c.toLowerCase());
+    return `<button onclick="selectOrAddChap('${escHtml(c)}')" style="padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid ${isActive?'#2d6e3e':isInDevis?'#4a9c5a':'var(--border)'};background:${isActive?'#2d6e3e':isInDevis?'rgba(74,156,90,.1)':'var(--bg)'};color:${isActive?'white':isInDevis?'#2d6e3e':'var(--text2)'};white-space:nowrap;">${c}</button>`;
+  }).join('');
+}
+
+function selectOrAddChap(label) {
+  // Si le chapitre existe déjà dans le devis, le sélectionner comme actif
+  const existing = lignes.find(l=>l.type==='chapter' && l.label.toLowerCase()===label.toLowerCase());
+  if(existing) {
+    activeChapId = existing.id;
+  } else {
+    // Sinon l'ajouter ET le sélectionner
+    const newChap = {id:uid(), type:'chapter', label};
+    lignes.push(newChap);
+    activeChapId = newChap.id;
   }
-}
-function addChap() {
-  const val = document.getElementById('chap-input').value.trim();
-  if(!val) return;
-  lignes.push({id:uid(), type:'chapter', label:val});
+  updateActiveChapBadge();
+  buildChapLibrary();
   renderLignes();
-  document.getElementById('chap-input').value = '';
-  showToast('Chapitre ajoute');
 }
-function addSubChap() {
-  const val = document.getElementById('chap-input').value.trim();
+
+function addFreeChap() {
+  const val = document.getElementById('chap-free').value.trim();
+  if(!val) return;
+  const newChap = {id:uid(), type:'chapter', label:val};
+  lignes.push(newChap);
+  activeChapId = newChap.id;
+  document.getElementById('chap-free').value = '';
+  updateActiveChapBadge();
+  buildChapLibrary();
+  renderLignes();
+  showToast('Chapitre ajoute et actif');
+}
+
+function addFreeSubChap() {
+  const val = document.getElementById('chap-free').value.trim();
   if(!val) return;
   lignes.push({id:uid(), type:'subchapter', label:val});
+  document.getElementById('chap-free').value = '';
+  buildChapLibrary();
   renderLignes();
-  document.getElementById('chap-input').value = '';
   showToast('Sous-chapitre ajoute');
 }
 
-// ── CATALOGUE ──────────────────────────────────
+function updateActiveChapBadge() {
+  const badge = document.getElementById('chap-active-badge');
+  const nameEl = document.getElementById('chap-active-name');
+  if(!badge||!nameEl) return;
+  if(activeChapId) {
+    const chap = lignes.find(l=>l.id===activeChapId);
+    if(chap) {
+      badge.style.display='block';
+      nameEl.textContent = chap.label;
+      return;
+    }
+  }
+  badge.style.display='none';
+  activeChapId=null;
+}
+
+// ── Catalogue ──────────────────────────────────────────────────────
 let catFilter = '';
-let catSearch = '';
 const cats = ['Toutes',...new Set(CATALOGUE.map(p=>p.categorie))];
 
 function buildCatFilters() {
   const el=document.getElementById('cat-filters');
+  if(!el)return;
   el.innerHTML=cats.map(c=>`<span class="cat-chip${c==='Toutes'?' on':''}" onclick="setCatFilter('${c}',this)">${c}</span>`).join('');
 }
-function buildFullCatFilters() {
-  const el=document.getElementById('full-cat-filters');
-  el.innerHTML=cats.map(c=>`<span class="cat-chip${c==='Toutes'?' on':''}" onclick="setFullCatFilter('${c}',this)">${c}</span>`).join('');
-}
+
 function setCatFilter(c,el) {
   catFilter=c==='Toutes'?'':c;
   document.querySelectorAll('#cat-filters .cat-chip').forEach(x=>x.classList.remove('on'));
   el.classList.add('on');
-  renderCatList('cat-list',document.getElementById('cat-search').value);
+  renderCatList(document.getElementById('cat-search').value);
 }
-function setFullCatFilter(c,el) {
-  document.querySelectorAll('#full-cat-filters .cat-chip').forEach(x=>x.classList.remove('on'));
-  el.classList.add('on');
-  renderFullCatList(c==='Toutes'?'':c);
-}
+
 function filterCat() {
-  renderCatList('cat-list',document.getElementById('cat-search').value);
+  renderCatList(document.getElementById('cat-search').value);
 }
-function filterFullCat() {
-  const search=document.getElementById('full-cat-search').value;
-  const activeChip=document.querySelector('#full-cat-filters .cat-chip.on');
-  const cat=activeChip&&activeChip.textContent!=='Toutes'?activeChip.textContent:'';
-  renderFullCatListFiltered(search,cat);
-}
-function renderCatList(listId, search) {
+
+function renderCatList(search) {
   const filtered=CATALOGUE.filter(p=>
     (!catFilter||p.categorie===catFilter)&&
     (!search||p.designation.toLowerCase().includes(search.toLowerCase()))
-  ).sort((a,b)=>b.occurrences-a.occurrences);
-  const el=document.getElementById(listId);
+  ).sort((a,b)=>a.designation.localeCompare(b.designation,'fr'));
+  const el=document.getElementById('cat-list');
+  if(!el)return;
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Aucune prestation trouvee</div>';
+    return;
+  }
   el.innerHTML=filtered.map(p=>`
-    <div class="cat-item" onclick="addPrestation(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-      <div>
-        <div class="cat-item-name">${p.designation}</div>
+    <div class="cat-item" onclick="openFiche(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <div style="flex:1;min-width:0;">
+        <div class="cat-item-name">${escHtml(p.designation)}</div>
         <div class="cat-item-cat">${p.categorie} · ${p.unite}</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
-        <div class="cat-item-price">${fmt(p.prixMoy)} E/${p.unite}</div>
-        ${p.occurrences>1?`<span class="cat-item-occ">${p.occurrences}x</span>`:''}
+        <div class="cat-item-price">${fmt(p.prixMoy)} E</div>
+        ${p.occurrences>1?`<div style="font-size:10px;color:var(--text3);">${p.occurrences} devis</div>`:''}
       </div>
     </div>
   `).join('');
 }
+
+// Catalogue plein ecran (onglet Catalogue)
+function buildFullCatFilters() {
+  const el=document.getElementById('full-cat-filters');
+  if(!el)return;
+  el.innerHTML=cats.map(c=>`<span class="cat-chip${c==='Toutes'?' on':''}" onclick="setFullCatFilter('${c}',this)">${c}</span>`).join('');
+}
+function setFullCatFilter(c,el) {
+  document.querySelectorAll('#full-cat-filters .cat-chip').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  const search=document.getElementById('full-cat-search')?.value||'';
+  renderFullCatListFiltered(search, c==='Toutes'?'':c);
+}
+function filterFullCat() {
+  const search=document.getElementById('full-cat-search').value;
+  const active=document.querySelector('#full-cat-filters .cat-chip.on');
+  renderFullCatListFiltered(search, active&&active.textContent!=='Toutes'?active.textContent:'');
+}
 function renderFullCatList(catF) {
-  const filtered=CATALOGUE.filter(p=>!catF||p.categorie===catF).sort((a,b)=>b.occurrences-a.occurrences);
-  document.getElementById('full-cat-list').innerHTML=filtered.map(p=>`
+  renderFullCatListFiltered('',catF);
+}
+function renderFullCatListFiltered(search,catF) {
+  const filtered=CATALOGUE.filter(p=>(!catF||p.categorie===catF)&&(!search||p.designation.toLowerCase().includes(search.toLowerCase()))).sort((a,b)=>a.designation.localeCompare(b.designation,'fr'));
+  const el=document.getElementById('full-cat-list');
+  if(!el)return;
+  el.innerHTML=filtered.map(p=>`
     <div class="cat-item">
-      <div><div class="cat-item-name">${p.designation}</div><div class="cat-item-cat">${p.categorie} · ${p.unite}</div></div>
+      <div style="flex:1;min-width:0;"><div class="cat-item-name">${escHtml(p.designation)}</div><div class="cat-item-cat">${p.categorie} · ${p.unite}</div></div>
       <div style="text-align:right;flex-shrink:0;">
         <div class="cat-item-price">${fmt(p.prixMoy)} E</div>
         <div style="font-size:10px;color:var(--text3);">${fmt(p.prixMin)} - ${fmt(p.prixMax)}</div>
@@ -639,440 +742,56 @@ function renderFullCatList(catF) {
     </div>
   `).join('');
 }
-function renderFullCatListFiltered(search,catF) {
-  const filtered=CATALOGUE.filter(p=>(!catF||p.categorie===catF)&&(!search||p.designation.toLowerCase().includes(search.toLowerCase()))).sort((a,b)=>b.occurrences-a.occurrences);
-  document.getElementById('full-cat-list').innerHTML=filtered.map(p=>`
-    <div class="cat-item">
-      <div><div class="cat-item-name">${p.designation}</div><div class="cat-item-cat">${p.categorie} · ${p.unite}</div></div>
-      <div style="text-align:right;flex-shrink:0;"><div class="cat-item-price">${fmt(p.prixMoy)} E</div></div>
-    </div>
-  `).join('');
-}
 
-// ── LIGNES ─────────────────────────────────────
-function addPrestation(p) {
-  const existing=lignes.find(l=>l.ref===p.id);
-  if(existing){existing.qte+=1;renderLignes();showToast('Quantite +1');return;}
-  lignes.push({id:uid(),ref:p.id,label:p.designation,unite:p.unite,qte:1,prix:p.prixMoy,rl:0,prixMin:p.prixMin,prixMax:p.prixMax});
-  renderLignes();
-  showToast('Ajoute');
+// ── Fiche prestation ───────────────────────────────────────────────
+function openFiche(p) {
+  ficheItem = p;
+  document.getElementById('fiche-designation').textContent = p.designation;
+  document.getElementById('fiche-cat').textContent = p.categorie+' · '+p.unite;
+  document.getElementById('fiche-min').textContent = fmt(p.prixMin)+' E';
+  document.getElementById('fiche-moy').textContent = fmt(p.prixMoy)+' E';
+  document.getElementById('fiche-max').textContent = fmt(p.prixMax)+' E';
+  document.getElementById('fiche-qte').value = '1';
+  document.getElementById('fiche-prix').value = p.prixMoy;
+  updateFicheTotal();
+  document.getElementById('prest-fiche').classList.remove('hidden');
+  document.getElementById('fiche-qte').addEventListener('input', updateFicheTotal);
+  document.getElementById('fiche-prix').addEventListener('input', updateFicheTotal);
 }
-function addLigneManuelle() {
-  lignes.push({id:uid(),ref:null,label:'Prestation',unite:'u',qte:1,prix:0,rl:0,prixMin:0,prixMax:0});
-  renderLignes();
+function updateFicheTotal() {
+  const q = parseFloat(document.getElementById('fiche-qte').value)||0;
+  const p = parseFloat(document.getElementById('fiche-prix').value)||0;
+  document.getElementById('fiche-total').textContent = fmt(q*p)+' E HT';
 }
-function delLigne(id) {
-  lignes=lignes.filter(l=>l.id!==id);
-  renderLignes();
+function closeFiche() {
+  document.getElementById('prest-fiche').classList.add('hidden');
+  ficheItem = null;
 }
-function moveLigne(id,dir) {
-  const i=lignes.findIndex(l=>l.id===id);
-  if(i<0)return;
-  const j=i+dir;
-  if(j<0||j>=lignes.length)return;
-  [lignes[i],lignes[j]]=[lignes[j],lignes[i]];
-  renderLignes();
-}
-function updLigne(id,field,val) {
-  const l=lignes.find(l=>l.id===id);
-  if(l){l[field]=field==='label'?val:parseFloat(val)||0;renderTotaux();}
-}
-function renderLignes() {
-  const el=document.getElementById('lignes-list');
-  document.getElementById('lignes-empty').style.display=lignes.length?'none':'block';
-  const existing=el.querySelectorAll('.ligne-row,.ligne-chap,.ligne-subchap');
-  existing.forEach(e=>e.remove());
-  lignes.forEach(l=>{
-    const div=document.createElement('div');
-    if(l.type==='chapter') {
-      div.className='ligne-chap';
-      div.style.cssText='background:linear-gradient(to right,rgba(45,110,62,.1),transparent);border-left:4px solid #2d6e3e;border-radius:var(--r2);padding:10px 12px;margin-bottom:4px;display:flex;align-items:center;gap:8px;';
-      div.innerHTML=`<span style="font-size:12px;">##</span><input value="${escHtml(l.label)}" onchange="updLigne('${l.id}','label',this.value)" style="flex:1;background:transparent;border:none;font-weight:700;font-size:15px;color:#1a3a2a;font-family:inherit;outline:none;"><button onclick="moveLigne('${l.id}',-1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↑</button><button onclick="moveLigne('${l.id}',1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↓</button><button onclick="delLigne('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;padding:2px 6px;">x</button>`;
-      el.appendChild(div); return;
+function validerFiche() {
+  if(!ficheItem) return;
+  const qte = parseFloat(document.getElementById('fiche-qte').value)||1;
+  const prix = parseFloat(document.getElementById('fiche-prix').value)||0;
+  const newLigne = {id:uid(), type:'prestation', ref:ficheItem.id, label:ficheItem.designation, unite:ficheItem.unite, qte, prix, rl:0, prixMin:ficheItem.prixMin, prixMax:ficheItem.prixMax};
+  // Inserer apres le chapitre actif (et ses prestations) ou a la fin
+  if(activeChapId) {
+    const idx = lignes.findLastIndex(l=>l.id===activeChapId||(lignes.findIndex(x=>x.id===activeChapId)<lignes.indexOf(l)&&l.type!=='chapter'));
+    // Find position: after last prestation of active chap
+    let insertIdx = lignes.length;
+    const chapIdx = lignes.findIndex(l=>l.id===activeChapId);
+    if(chapIdx !== -1) {
+      let i = chapIdx+1;
+      while(i<lignes.length && lignes[i].type!=='chapter') i++;
+      insertIdx = i;
     }
-    if(l.type==='subchapter') {
-      div.className='ligne-subchap';
-      div.style.cssText='background:rgba(74,156,90,.06);border-left:3px solid #4a9c5a;border-radius:var(--r2);padding:8px 12px;margin-bottom:4px;margin-left:12px;display:flex;align-items:center;gap:8px;';
-      div.innerHTML=`<span style="font-size:12px;">#</span><input value="${escHtml(l.label)}" onchange="updLigne('${l.id}','label',this.value)" style="flex:1;background:transparent;border:none;font-weight:600;font-size:13px;color:#2d6e3e;font-family:inherit;outline:none;"><button onclick="moveLigne('${l.id}',-1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↑</button><button onclick="moveLigne('${l.id}',1)" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:2px 4px;">↓</button><button onclick="delLigne('${l.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;padding:2px 6px;">x</button>`;
-      el.appendChild(div); return;
-    }
-    div.className='ligne-row';
-    div.innerHTML=`
-      <div class="ligne-row-header">
-        <input class="ligne-name" value="${escHtml(l.label)}" onchange="updLigne('${l.id}','label',this.value)">
-        <button class="ligne-del" onclick="delLigne('${l.id}')">x</button>
-      </div>
-      <div class="ligne-nums">
-        <div>
-          <div class="ligne-num-label">Unite</div>
-          <select class="ligne-input" style="text-align:left;" onchange="updLigne('${l.id}','unite',this.value)">
-            ${['m2','ml','u','h','forfait','ENS','m3','kg'].map(u=>`<option${u===l.unite?' selected':''}>${u}</option>`).join('')}
-          </select>
-        </div>
-        <div>
-          <div class="ligne-num-label">P.U. HT</div>
-          <input type="number" class="ligne-input" value="${l.prix}" min="0" step="0.01" onchange="updLigne('${l.id}','prix',this.value)">
-        </div>
-        <div>
-          <div class="ligne-num-label">Qte</div>
-          <input type="number" class="ligne-input" value="${l.qte}" min="0" step="0.5" onchange="updLigne('${l.id}','qte',this.value)">
-        </div>
-        <div>
-          <div class="ligne-num-label">Total HT</div>
-          <div class="ligne-total" id="lt-${l.id}">${fmt(l.qte*l.prix)} E</div>
-        </div>
-      </div>
-    `;
-    el.appendChild(div);
-  });
-  renderTotaux();
-}
-function renderTotaux() {
-  // Update individual totals
-  lignes.forEach(l=>{
-    const el=document.getElementById('lt-'+l.id);
-    if(el)el.textContent=fmt(l.qte*l.prix*(1-l.rl/100))+' E';
-  });
-  const t=calcTotaux();
-  const el=document.getElementById('totaux-mini');
-  if(!el)return;
-  const tvaRate=parseInt(document.getElementById('devis-tva')?.value||'10');
-  const acompteRate=parseInt(document.getElementById('devis-acompte')?.value||'30');
-  el.innerHTML=`
-    <div class="total-row"><span>Total HT</span><span>${fmt(t.ht)} E</span></div>
-    <div class="total-row"><span>TVA ${tvaRate}%</span><span>${fmt(t.tva)} E</span></div>
-    <div class="total-ttc">
-      <span class="total-ttc-label">TOTAL TTC</span>
-      <span class="total-ttc-val">${fmt(t.ttc)} E</span>
-    </div>
-    ${acompteRate>0?`<div class="total-row" style="margin-top:8px;"><span>Acompte ${acompteRate}%</span><span style="font-weight:600;color:var(--vert)">${fmt(t.ttc*acompteRate/100)} E</span></div>`:''}
-  `;
-}
-function calcTotaux() {
-  const tvaRate=parseInt(document.getElementById('devis-tva')?.value||'10')/100;
-  const ht=lignes.reduce((s,l)=>s+l.qte*l.prix*(1-l.rl/100),0);
-  const tva=ht*tvaRate;
-  return {ht,tva,ttc:ht+tva};
-}
-
-// ── APERCU ─────────────────────────────────────
-function buildApercu() {
-  const t=calcTotaux();
-  const tvaRate=document.getElementById('devis-tva').value;
-  const acompteRate=parseInt(document.getElementById('devis-acompte').value||'30');
-  const num='DEV-'+new Date().getFullYear()+'-'+uid().slice(0,6).toUpperCase();
-  const date1=document.getElementById('devis-date').value;
-  const date2=document.getElementById('devis-valid').value;
-  const cli={
-    nom:document.getElementById('cli-nom').value,
-    adresse:document.getElementById('cli-adresse').value,
-    cp:document.getElementById('cli-cp').value,
-    ville:document.getElementById('cli-ville').value,
-    email:document.getElementById('cli-email').value,
-    tel:document.getElementById('cli-tel').value,
-    desc:document.getElementById('cli-desc').value,
-  };
-  currentDevis={num,date1,date2,cli,lignes:[...lignes],tvaRate,acompteRate,t,sigClient:null};
-  
-  const html=`
-    <div style="border-bottom:2px solid var(--vert);padding-bottom:12px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <img src="${LOGO}" style="height:50px;">
-        <div style="text-align:right;">
-          <div style="font-size:16px;font-weight:700;color:var(--vert);">${num}</div>
-          <div style="font-size:12px;color:var(--text2);">Emis le ${fmtDate(date1)}</div>
-          <div style="font-size:12px;color:#c0392b;">Valable ${fmtDate(date2)}</div>
-        </div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <div>
-        <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);margin-bottom:4px;">EMETTEUR</div>
-        <div style="font-weight:700;">${SOC.nom}</div>
-        <div style="font-size:12px;color:var(--text2);">${SOC.adresse}</div>
-        <div style="font-size:12px;color:var(--text2);">${SOC.tel}</div>
-        <div style="font-size:11px;color:var(--text3);">SIRET ${SOC.siret}</div>
-      </div>
-      <div>
-        <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);margin-bottom:4px;">CLIENT</div>
-        <div style="font-weight:700;">${cli.nom||'-'}</div>
-        <div style="font-size:12px;color:var(--text2);">${cli.adresse} ${cli.cp} ${cli.ville}</div>
-        <div style="font-size:12px;color:var(--text2);">${cli.tel}</div>
-        <div style="font-size:12px;color:var(--bleu);">${cli.email}</div>
-      </div>
-    </div>
-    ${cli.desc?`<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text2);margin-bottom:12px;font-style:italic;">${cli.desc}</div>`:''}`+
-    lignes.map(l=>{
-      if(l.type==='chapter') return `<div style="background:rgba(45,110,62,.08);border-left:4px solid #2d6e3e;padding:8px 12px;margin:8px 0 4px;font-weight:700;font-size:14px;border-radius:4px;">${escHtml(l.label)}</div>`;
-      if(l.type==='subchapter') return `<div style="border-left:3px solid #4a9c5a;padding:6px 10px;margin:4px 0 4px 12px;font-weight:600;font-size:13px;color:#2d6e3e;">${escHtml(l.label)}</div>`;
-      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee;gap:8px;">
-        <div style="flex:1;"><div style="font-size:13px;">${escHtml(l.label)}</div><div style="font-size:11px;color:var(--text3);">${l.unite||''}</div></div>
-        <div style="text-align:right;flex-shrink:0;font-size:12px;color:var(--text2);">${l.qte} x ${fmt(l.prix)} E<br><b style="color:var(--text)">${fmt(l.qte*l.prix)} E</b></div>
-      </div>`;
-    }).join('')+`
-    <div style="margin-top:12px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
-        <span>Total HT</span><span>${fmt(t.ht)} E</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #eee;">
-        <span>TVA ${tvaRate}%</span><span>${fmt(t.tva)} E</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;background:linear-gradient(135deg,#2d6e3e,#4a9c5a);color:#fff;padding:10px 12px;border-radius:8px;margin-top:6px;">
-        <span style="font-size:13px;">TOTAL TTC</span>
-        <span style="font-size:18px;font-weight:700;">${fmt(t.ttc)} E</span>
-      </div>
-      ${acompteRate>0?`<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px;background:#f0f8f0;border-radius:6px;margin-top:6px;"><span>Acompte ${acompteRate}%</span><span style="font-weight:600;color:var(--vert)">${fmt(t.ttc*acompteRate/100)} E</span></div>`:''}
-    </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--text3);">
-      <div>IBAN: ${SOC.iban} - BIC: ${SOC.bic}</div>
-    </div>
-  `;
-  document.getElementById('apercu-content').innerHTML=html;
-}
-
-// ── SIGNATURE ──────────────────────────────────
-let sigCtx, sigDrawing=false, sigLastX=0, sigLastY=0;
-function initSigCanvas() {
-  const canvas=document.getElementById('sig-canvas');
-  canvas.width=canvas.offsetWidth||400;
-  function getPos(e) {
-    const rect=canvas.getBoundingClientRect();
-    const src=e.touches?e.touches[0]:e;
-    return [src.clientX-rect.left,src.clientY-rect.top];
+    lignes.splice(insertIdx, 0, newLigne);
+  } else {
+    lignes.push(newLigne);
   }
-  sigCtx=canvas.getContext('2d');
-  sigCtx.strokeStyle='#1a2e1a';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
-  canvas.addEventListener('mousedown',e=>{sigDrawing=true;[sigLastX,sigLastY]=getPos(e);});
-  canvas.addEventListener('mousemove',e=>{if(!sigDrawing)return;const[x,y]=getPos(e);sigCtx.beginPath();sigCtx.moveTo(sigLastX,sigLastY);sigCtx.lineTo(x,y);sigCtx.stroke();[sigLastX,sigLastY]=[x,y];});
-  canvas.addEventListener('mouseup',()=>{sigDrawing=false;});
-  canvas.addEventListener('touchstart',e=>{e.preventDefault();sigDrawing=true;[sigLastX,sigLastY]=getPos(e);},{passive:false});
-  canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!sigDrawing)return;const[x,y]=getPos(e);sigCtx.beginPath();sigCtx.moveTo(sigLastX,sigLastY);sigCtx.lineTo(x,y);sigCtx.stroke();[sigLastX,sigLastY]=[x,y];},{passive:false});
-  canvas.addEventListener('touchend',()=>{sigDrawing=false;});
-}
-function clearSig() {sigCtx.clearRect(0,0,document.getElementById('sig-canvas').width,200);sigData=null;}
-function captureSig() {sigData=document.getElementById('sig-canvas').toDataURL();}
-
-// ── ENVOI EMAIL ────────────────────────────────
-async function envoyerDevis() {
-  captureSig();
-  const email=document.getElementById('send-email').value;
-  if(!email){showToast('Entrez un email');return;}
-  const svcId=localStorage.getItem('ejs_service');
-  const tplId=localStorage.getItem('ejs_template');
-  const pubKey=localStorage.getItem('ejs_pubkey');
-  if(!svcId||!tplId||!pubKey){
-    document.getElementById('send-status').innerHTML='<span style="color:#e53935;">Configurez EmailJS dans Reglages avant</span>';
-    return;
-  }
-  document.getElementById('send-status').textContent='Envoi en cours...';
-  try{
-    // Load EmailJS dynamically
-    if(!window.emailjs) {
-      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
-      emailjs.init(pubKey);
-    }
-    const msg=document.getElementById('send-msg').value||'Veuillez trouver en piece jointe votre devis.';
-    const result=await emailjs.send(svcId,tplId,{
-      to_email:email,
-      to_name:currentDevis.cli.nom,
-      from_name:'Loire Amenagement',
-      devis_num:currentDevis.num,
-      montant_ttc:fmt(currentDevis.t.ttc)+' E TTC',
-      message:msg,
-      reply_to:'contact@loire-amenagement.com',
-    });
-    document.getElementById('send-status').innerHTML='<span style="color:var(--vert);">Email envoye avec succes !</span>';
-    sauvegarderDevis();
-    showToast('Email envoye !');
-  }catch(e){
-    document.getElementById('send-status').innerHTML='<span style="color:#e53935;">Erreur: '+e.text+'</span>';
-  }
-}
-
-function imprimerDevis() {
-  captureSig();
-  buildPrintArea();
-  window.print();
-}
-
-function buildPrintArea() {
-  if(!currentDevis)return;
-  const t=currentDevis.t;
-  const acompte=t.ttc*currentDevis.acompteRate/100;
-  document.getElementById('print-area').innerHTML=`
-    <div style="padding:40px;font-family:Arial,sans-serif;color:#1a2e1a;max-width:800px;margin:0 auto;">
-      <div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a,#3a8fbf);border-radius:8px;padding:16px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <img src="${LOGO}" style="height:56px;border-radius:4px;background:white;padding:3px;">
-          <div><div style="color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.2em;">DEVIS ESTIMATIF</div><div style="color:white;font-size:20px;font-weight:700;">${currentDevis.num}</div></div>
-        </div>
-        <div style="text-align:right;color:white;font-size:12px;"><div>Emis le ${fmtDate(currentDevis.date1)}</div><div style="color:#ffd0d0;">Valable ${fmtDate(currentDevis.date2)}</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:16px;margin-bottom:24px;">
-        <div>
-          <div style="font-size:10px;letter-spacing:.15em;color:#888;font-weight:600;margin-bottom:6px;">EMETTEUR</div>
-          <div style="font-weight:700;font-size:14px;">${SOC.nom}</div>
-          <div style="font-size:12px;color:#555;margin-top:2px;">${SOC.adresse}</div>
-          <div style="font-size:12px;color:#555;">Tel: ${SOC.tel} / ${SOC.tel2}</div>
-          <div style="font-size:12px;color:#3a8fbf;">${SOC.email}</div>
-          <div style="font-size:10px;color:#aaa;margin-top:4px;">SIRET ${SOC.siret} - ${SOC.rcs}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-          <div style="flex:1;width:1px;background:#eee;"></div>
-          <img src="${QR}" style="width:50px;height:50px;border-radius:4px;">
-          <div style="font-size:8px;color:#bbb;text-align:center;">AVIS</div>
-          <div style="flex:1;width:1px;background:#eee;"></div>
-        </div>
-        <div>
-          <div style="font-size:10px;letter-spacing:.15em;color:#888;font-weight:600;margin-bottom:6px;">CLIENT</div>
-          <div style="font-weight:700;font-size:14px;">${currentDevis.cli.nom||'-'}</div>
-          <div style="font-size:12px;color:#555;">${currentDevis.cli.adresse} ${currentDevis.cli.cp} ${currentDevis.cli.ville}</div>
-          <div style="font-size:12px;color:#555;">${currentDevis.cli.tel}</div>
-          <div style="font-size:12px;color:#3a8fbf;">${currentDevis.cli.email}</div>
-          ${currentDevis.cli.desc?`<div style="margin-top:8px;padding:6px 8px;background:#f5f5f5;border-radius:4px;font-size:11px;color:#666;border-left:3px solid #2d6e3e;">${currentDevis.cli.desc}</div>`:''}
-        </div>
-      </div>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-        <thead><tr style="background:linear-gradient(to right,#2d6e3e,#4a9c5a);color:white;">
-          <th style="padding:10px;text-align:left;font-size:11px;">DESIGNATION</th>
-          <th style="padding:10px;text-align:right;font-size:11px;">UNITE</th>
-          <th style="padding:10px;text-align:right;font-size:11px;">QTE</th>
-          <th style="padding:10px;text-align:right;font-size:11px;">P.U. HT</th>
-          <th style="padding:10px;text-align:right;font-size:11px;">TOTAL HT</th>
-        </tr></thead>
-        <tbody>
-          ${currentDevis.lignes.map((l,i)=>`
-            <tr style="background:${i%2===0?'#fafafa':'white'}">
-              <td style="padding:9px;font-size:13px;">${escHtml(l.label)}</td>
-              <td style="padding:9px;text-align:right;font-size:12px;color:#888;">${l.unite}</td>
-              <td style="padding:9px;text-align:right;font-size:13px;">${l.qte}</td>
-              <td style="padding:9px;text-align:right;font-size:13px;">${fmt(l.prix)} E</td>
-              <td style="padding:9px;text-align:right;font-size:13px;font-weight:600;">${fmt(l.qte*l.prix)} E</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:24px;">
-        <div style="width:280px;">
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e8e0d0;font-size:13px;"><span>Total HT</span><span>${fmt(t.ht)} E</span></div>
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e8e0d0;font-size:13px;"><span>TVA ${currentDevis.tvaRate}%</span><span>${fmt(t.tva)} E</span></div>
-          <div style="display:flex;justify-content:space-between;background:linear-gradient(135deg,#2d6e3e,#4a9c5a);color:white;padding:12px;border-radius:6px;margin-top:6px;"><span style="font-size:12px;">TOTAL TTC</span><span style="font-size:18px;font-weight:700;">${fmt(t.ttc)} E</span></div>
-          ${currentDevis.acompteRate>0?`<div style="display:flex;justify-content:space-between;padding:8px;background:#f0f8f0;border-radius:6px;margin-top:6px;font-size:12px;border-left:3px solid #2d6e3e;"><span>Acompte ${currentDevis.acompteRate}%</span><span style="font-weight:700;color:#2d6e3e">${fmt(acompte)} E</span></div>`:''}
-        </div>
-      </div>
-      <div style="margin-bottom:20px;padding:14px;background:#f5f0e8;border-radius:8px;">
-        <div style="font-size:10px;letter-spacing:.15em;color:#8a7a5a;margin-bottom:8px;">MODALITES DE REGLEMENT</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px;color:#666;line-height:1.8;">
-          <div>
-            <div>Banque: Credit Mutuel - CCM St Sebastien</div>
-            <div>IBAN: ${SOC.iban}</div>
-            <div>BIC: ${SOC.bic}</div>
-          </div>
-          <div>
-            <div>Acompte commande: <b style="color:#2d6e3e">${fmt(acompte)} E TTC</b></div>
-            <div>Solde reception: <b>${fmt(t.ttc-acompte)} E TTC</b></div>
-          </div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div style="border:1px dashed #ddd;border-radius:8px;padding:16px;min-height:80px;">
-          <div style="font-size:10px;letter-spacing:.12em;color:#8a7a5a;margin-bottom:8px;">BON POUR ACCORD - CLIENT</div>
-          <div style="font-size:11px;color:#bbb;margin-bottom:4px;">Date et signature:</div>
-          ${sigData?`<img src="${sigData}" style="max-height:70px;max-width:100%;">`:''}
-        </div>
-        <div style="border:1px solid #e0ead8;border-radius:8px;padding:16px;min-height:80px;background:#fafcf8;">
-          <div style="font-size:10px;letter-spacing:.12em;color:#8a7a5a;margin-bottom:8px;">SIGNATURE LOIRE AMENAGEMENT</div>
-          <img src="${SIG_LA}" style="max-height:70px;max-width:100%;object-fit:contain;">
-        </div>
-      </div>
-      <div style="border-top:2px solid #2d6e3e;padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <img src="${LOGO}" style="height:30px;">
-          <div style="font-size:10px;color:#aaa;line-height:1.6;">
-            <div>${SOC.adresse}</div>
-            <div>${SOC.tel} - ${SOC.email}</div>
-            <div>SIRET ${SOC.siret}</div>
-          </div>
-        </div>
-        <img src="${QR}" style="width:38px;height:38px;border-radius:3px;">
-      </div>
-    </div>
-  `;
-}
-
-// ── SAUVEGARDER ────────────────────────────────
-function sauvegarderDevis() {
-  if(!currentDevis)return;
-  captureSig();
-  currentDevis.sigClient=sigData;
-  currentDevis.savedAt=new Date().toISOString();
-  devisList=devisList.filter(d=>d.num!==currentDevis.num);
-  devisList.unshift(currentDevis);
-  localStorage.setItem('la_devis',JSON.stringify(devisList));
-  renderDevisList();
-  showToast('Devis sauvegarde');
-}
-function renderDevisList() {
-  const el=document.getElementById('devis-list');
-  if(!devisList.length){
-    el.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">📋</div><div>Aucun devis</div></div>';
-    return;
-  }
-  el.innerHTML=devisList.map(d=>`
-    <div class="card" style="cursor:pointer;" onclick="ouvrirDevis('${d.num}')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;">${d.cli?.nom||'-'}</div>
-          <div style="font-size:11px;color:var(--text3);">${d.num} · ${fmtDate(d.date1)}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:16px;font-weight:700;color:var(--vert)">${fmt(d.t?.ttc||0)} E</div>
-          <div style="font-size:11px;color:var(--text3);">TTC</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-function ouvrirDevis(num) {
-  const d=devisList.find(x=>x.num===num);
-  if(!d)return;
-  currentDevis=d;
-  lignes=[...d.lignes];
-  document.getElementById('cli-nom').value=d.cli.nom||'';
-  document.getElementById('cli-adresse').value=d.cli.adresse||'';
-  document.getElementById('cli-cp').value=d.cli.cp||'';
-  document.getElementById('cli-ville').value=d.cli.ville||'';
-  document.getElementById('cli-email').value=d.cli.email||'';
-  document.getElementById('cli-tel').value=d.cli.tel||'';
-  document.getElementById('cli-desc').value=d.cli.desc||'';
-  document.getElementById('devis-tva').value=d.tvaRate||'10';
-  document.getElementById('devis-acompte').value=d.acompteRate||'30';
-  showScreen('nouveau');
+  closeFiche();
   renderLignes();
-  goStep(3);
-}
-function nouveauDevis() {
-  lignes=[];sigData=null;currentDevis=null;
-  document.querySelectorAll('#s-nouveau input,#s-nouveau textarea').forEach(el=>{if(el.type!=='date'&&el.type!=='number')el.value='';});
-  document.getElementById('devis-acompte').value='30';
-  document.getElementById('devis-tva').value='10';
-  const today=new Date().toISOString().split('T')[0];
-  const in15=new Date(Date.now()+15*86400000).toISOString().split('T')[0];
-  document.getElementById('devis-date').value=today;
-  document.getElementById('devis-valid').value=in15;
-  clearSig();
-  renderLignes();
-  goStep(1);
+  showToast('Ajoute: '+ficheItem.designation.slice(0,30));
 }
 
-// ── PARAMETRES ─────────────────────────────────
-function saveApiKey(){localStorage.setItem('la_apikey',document.getElementById('api-key-input').value);showToast('Cle API enregistree');}
-function saveEmailJS(){
-  localStorage.setItem('ejs_service',document.getElementById('ejs-service').value);
-  localStorage.setItem('ejs_template',document.getElementById('ejs-template').value);
-  localStorage.setItem('ejs_pubkey',document.getElementById('ejs-pubkey').value);
-  showToast('EmailJS configure');
-}
 
 // RDV GOOGLE AGENDA (OAuth officiel) v3
 const APP_VERSION = 'v3-' + new Date().toISOString().slice(0,16);
