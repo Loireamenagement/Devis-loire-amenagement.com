@@ -422,7 +422,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button onclick="closeRdvModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">x</button>
     </div>
     <div id="rdv-content">
-      <div style="text-align:center;padding:30px;color:var(--text3);">Chargement des RDV...</div>
+      <div style="text-align:center;padding:30px;color:var(--text3);">...</div>
     </div>
   </div>
 </div>
@@ -1001,11 +1001,13 @@ function saveEmailJS(){
   showToast('EmailJS configure');
 }
 
-// ── RDV GOOGLE AGENDA (OAuth officiel) ──────────
+// RDV GOOGLE AGENDA (OAuth officiel) v3
+const APP_VERSION = 'v3-' + new Date().toISOString().slice(0,16);
 const GOOGLE_CLIENT_ID = '439283325349-qkeq67cv9qjuh9olsbq19qpt1db9hu8m.apps.googleusercontent.com';
 const GCAL_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
-let gAccessToken = sessionStorage.getItem('g_access_token') || null;
+let gAccessToken = null; // jamais auto-restaure: toujours explicite
 let tokenClient = null;
+let gisReady = false;
 
 function initGoogleAuth() {
   if(typeof google === 'undefined' || !google.accounts) { setTimeout(initGoogleAuth, 300); return; }
@@ -1013,34 +1015,60 @@ function initGoogleAuth() {
     client_id: GOOGLE_CLIENT_ID,
     scope: GCAL_SCOPE,
     callback: (resp) => {
-      if(resp.access_token) {
+      if(resp && resp.access_token) {
         gAccessToken = resp.access_token;
-        sessionStorage.setItem('g_access_token', gAccessToken);
+        renderRdvModalState();
         fetchRdvs();
+      } else {
+        showRdvError('Connexion refusee ou annulee.');
       }
+    },
+    error_callback: (err) => {
+      showRdvError('Erreur Google: ' + (err && err.type ? err.type : 'inconnue'));
     }
   });
+  gisReady = true;
 }
 
 function openRdvModal() {
   document.getElementById('rdv-modal').classList.remove('hidden');
-  if(gAccessToken) {
-    fetchRdvs();
-  } else {
-    document.getElementById('rdv-content').innerHTML = `
-      <div style="text-align:center;padding:30px 10px;">
-        <div style="font-size:36px;margin-bottom:12px;">📅</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Connectez votre Google Agenda pour voir vos RDV</div>
-        <button class="btn btn-blue" onclick="connectGoogle()">Se connecter avec Google</button>
-      </div>`;
-  }
+  renderRdvModalState();
 }
 function closeRdvModal() {
   document.getElementById('rdv-modal').classList.add('hidden');
 }
+function renderRdvModalState() {
+  const content = document.getElementById('rdv-content');
+  if(gAccessToken) {
+    content.innerHTML = `
+      <div style="text-align:center;padding:16px 10px;">
+        <button class="btn btn-blue btn-full" onclick="fetchRdvs()">Voir mes RDV (30 prochains jours)</button>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);">${APP_VERSION}</div>
+      </div>`;
+  } else {
+    content.innerHTML = `
+      <div style="text-align:center;padding:16px 10px;">
+        <div style="font-size:36px;margin-bottom:12px;">📅</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Connectez votre Google Agenda</div>
+        <button class="btn btn-blue btn-full" onclick="connectGoogle()">Se connecter avec Google</button>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);">${APP_VERSION}</div>
+      </div>`;
+  }
+}
+function showRdvError(msg) {
+  document.getElementById('rdv-content').innerHTML = `
+    <div style="text-align:center;padding:16px 10px;">
+      <div style="color:#e53935;font-size:13px;margin-bottom:14px;">${msg}</div>
+      <button class="btn btn-blue btn-full" onclick="connectGoogle()">Reessayer la connexion</button>
+    </div>`;
+}
 function connectGoogle() {
-  if(!tokenClient) { showToast('Initialisation en cours, reessayez'); return; }
-  tokenClient.requestAccessToken({prompt:''});
+  if(!gisReady || !tokenClient) {
+    showRdvError('Google n est pas encore pret. Patientez 2 secondes et reessayez.');
+    return;
+  }
+  document.getElementById('rdv-content').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);">Ouverture de la fenetre Google...</div>';
+  tokenClient.requestAccessToken({prompt:'consent'});
 }
 
 async function fetchRdvs() {
@@ -1058,13 +1086,12 @@ async function fetchRdvs() {
     const res = await fetch(url, { headers: { 'Authorization': 'Bearer '+gAccessToken }, signal: controller.signal });
     clearTimeout(timeoutId);
     if(res.status === 401) {
-      // Token expire, redemander
       gAccessToken = null;
-      sessionStorage.removeItem('g_access_token');
-      content.innerHTML = `<div style="text-align:center;padding:20px;">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Session expiree</div>
-        <button class="btn btn-blue" onclick="connectGoogle()">Se reconnecter</button>
-      </div>`;
+      showRdvError('Session expiree, reconnectez-vous.');
+      return;
+    }
+    if(!res.ok) {
+      showRdvError('Erreur API Google (code '+res.status+')');
       return;
     }
     const data = await res.json();
@@ -1088,11 +1115,8 @@ async function fetchRdvs() {
         </div>`;
     }).join('');
   } catch(e) {
-    const msg = e.name==='AbortError' ? 'Pas de reponse du serveur (timeout). Reessayez ou reconnectez-vous.' : 'Erreur: '+e.message;
-    content.innerHTML = `<div style="text-align:center;padding:20px;">
-      <div style="color:#e53935;font-size:13px;margin-bottom:12px;">${msg}</div>
-      <button class="btn btn-blue" onclick="gAccessToken=null;sessionStorage.removeItem('g_access_token');connectGoogle();">Se reconnecter</button>
-    </div>`;
+    const msg = e.name==='AbortError' ? 'Pas de reponse du serveur (timeout 8s).' : 'Erreur reseau: '+e.message;
+    showRdvError(msg);
   }
 }
 
@@ -1127,6 +1151,7 @@ function pickRdv(i) {
 }
 
 // UTILS
+
 function fmt(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}catch(e){return d;}}
 function uid(){return Math.random().toString(36).slice(2,10).toUpperCase();}
