@@ -1053,7 +1053,10 @@ async function fetchRdvs() {
       + 'timeMin='+encodeURIComponent(now)
       + '&timeMax='+encodeURIComponent(end)
       + '&singleEvents=true&orderBy=startTime&maxResults=25';
-    const res = await fetch(url, { headers: { 'Authorization': 'Bearer '+gAccessToken } });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=>controller.abort(), 8000);
+    const res = await fetch(url, { headers: { 'Authorization': 'Bearer '+gAccessToken }, signal: controller.signal });
+    clearTimeout(timeoutId);
     if(res.status === 401) {
       // Token expire, redemander
       gAccessToken = null;
@@ -1085,7 +1088,11 @@ async function fetchRdvs() {
         </div>`;
     }).join('');
   } catch(e) {
-    content.innerHTML = '<div style="text-align:center;padding:20px;color:#e53935;font-size:13px;">Erreur: '+e.message+'</div>';
+    const msg = e.name==='AbortError' ? 'Pas de reponse du serveur (timeout). Reessayez ou reconnectez-vous.' : 'Erreur: '+e.message;
+    content.innerHTML = `<div style="text-align:center;padding:20px;">
+      <div style="color:#e53935;font-size:13px;margin-bottom:12px;">${msg}</div>
+      <button class="btn btn-blue" onclick="gAccessToken=null;sessionStorage.removeItem('g_access_token');connectGoogle();">Se reconnecter</button>
+    </div>`;
   }
 }
 
