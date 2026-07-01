@@ -652,27 +652,105 @@ async function envoyerDevis() {
   try {
     // Build email with embedded HTML (Gmail API)
     const subject = 'Devis Loire Amenagement - ' + (currentDevis?.num||'');
-    const htmlBody = `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#333;">
-      <div style="max-width:600px;margin:0 auto;">
-        <div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a);padding:20px;border-radius:8px 8px 0 0;">
-          <h2 style="color:white;margin:0;">Devis Loire Amenagement</h2>
-          <p style="color:rgba(255,255,255,.8);margin:4px 0 0;">Reference: ${currentDevis?.num||''}</p>
+    // Build full devis HTML for email
+    const lignesHtml = (currentDevis?.lignes||[]).map(l=>{
+      if(l.type==='chapter')    return `<tr><td colspan="5" style="background:#f2f8f3;border-left:4px solid #2d6e3e;padding:8px 12px;font-weight:700;font-size:13px;">${escHtml(l.label)}</td></tr>`;
+      if(l.type==='subchapter') return `<tr><td colspan="5" style="background:#f7faf3;border-left:3px solid #4a9c5a;padding:6px 12px 6px 20px;font-weight:600;font-size:12px;color:#2d6e3e;">${escHtml(l.label)}</td></tr>`;
+      return `<tr style="border-bottom:1px solid #eee;">
+        <td style="padding:8px 10px;font-size:12px;">${escHtml(l.label)}</td>
+        <td style="padding:8px;text-align:center;font-size:11px;color:#888;">${l.unite||''}</td>
+        <td style="padding:8px;text-align:right;font-size:12px;">${l.qte}</td>
+        <td style="padding:8px;text-align:right;font-size:12px;">${fmt(l.prix||0)} €</td>
+        <td style="padding:8px;text-align:right;font-size:12px;font-weight:600;">${fmt(l.qte*(l.prix||0))} €</td>
+      </tr>`;
+    }).join('');
+
+    const sigHtml = currentDevis?.sigClient
+      ? `<img src="${currentDevis.sigClient}" style="max-height:80px;max-width:200px;">`
+      : '';
+
+    const htmlBody = `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#333;margin:0;padding:0;">
+      <div style="max-width:700px;margin:0 auto;padding:20px;">
+
+        <!-- BANDEAU -->
+        <div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a);padding:20px 24px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.15em;">DEVIS ESTIMATIF</div>
+            <div style="color:white;font-size:20px;font-weight:700;">${currentDevis?.num||''}</div>
+          </div>
+          <div style="text-align:right;color:white;font-size:12px;">
+            <div>Emis le ${fmtDate(currentDevis?.date1||'')}</div>
+            <div style="color:#ffd0d0;">Valable ${fmtDate(currentDevis?.date2||'')}</div>
+          </div>
         </div>
-        <div style="padding:24px;background:#f9f9f9;border:1px solid #eee;">
-          <p>Bonjour ${escHtml(currentDevis?.cli?.nom||'')},</p>
-          <p>${escHtml(msg)}</p>
-          <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+
+        <!-- EN-TETE CLIENT -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;background:#f9fafb;border:1px solid #eee;border-top:none;">
+          <div>
+            <div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">EMETTEUR</div>
+            <div style="font-weight:700;">${SOC.nom}</div>
+            <div style="font-size:12px;color:#555;">${SOC.adresse}</div>
+            <div style="font-size:12px;color:#555;">${SOC.tel}</div>
+            <div style="font-size:12px;color:#3a8fbf;">${SOC.email}</div>
+            <div style="font-size:10px;color:#aaa;margin-top:4px;">SIRET ${SOC.siret}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">CLIENT</div>
+            <div style="font-weight:700;">${escHtml(currentDevis?.cli?.nom||'-')}</div>
+            <div style="font-size:12px;color:#555;">${escHtml(currentDevis?.cli?.adresse||'')} ${currentDevis?.cli?.cp||''} ${escHtml(currentDevis?.cli?.ville||'')}</div>
+            <div style="font-size:12px;color:#555;">${currentDevis?.cli?.tel||''}</div>
+            <div style="font-size:12px;color:#3a8fbf;">${currentDevis?.cli?.email||''}</div>
+          </div>
+        </div>
+
+        <!-- MESSAGE -->
+        <div style="padding:16px 20px;background:#fff;border:1px solid #eee;border-top:none;">
+          <p style="margin:0;color:#333;">Bonjour ${escHtml(currentDevis?.cli?.nom||'')},</p>
+          <p style="margin:8px 0 0;color:#555;">${escHtml(msg)}</p>
+        </div>
+
+        <!-- TABLEAU PRESTATIONS -->
+        <table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-top:none;">
+          <thead>
             <tr style="background:#2d6e3e;color:white;">
-              <td style="padding:10px;font-weight:bold;">Montant TTC</td>
-              <td style="padding:10px;text-align:right;font-size:20px;font-weight:bold;">${fmt(currentDevis?.t?.ttc||0)} €</td>
+              <th style="padding:10px;text-align:left;font-size:11px;">DESIGNATION</th>
+              <th style="padding:10px;text-align:center;font-size:11px;">UNITE</th>
+              <th style="padding:10px;text-align:right;font-size:11px;">QTE</th>
+              <th style="padding:10px;text-align:right;font-size:11px;">P.U. HT</th>
+              <th style="padding:10px;text-align:right;font-size:11px;">TOTAL HT</th>
             </tr>
-            ${currentDevis?.acompteRate>0?`<tr style="background:#f0f8f0;"><td style="padding:8px;">Acompte (${currentDevis.acompteRate}%)</td><td style="padding:8px;text-align:right;color:#2d6e3e;font-weight:bold;">${fmt((currentDevis?.t?.ttc||0)*currentDevis.acompteRate/100)} €</td></tr>`:''}
-          </table>
-          <p style="font-size:13px;color:#888;">Pour valider votre commande, merci de nous retourner ce devis signe avec la mention "Bon pour accord".</p>
+          </thead>
+          <tbody>${lignesHtml}</tbody>
+        </table>
+
+        <!-- TOTAUX -->
+        <div style="padding:16px 20px;background:#f9fafb;border:1px solid #eee;border-top:none;display:flex;justify-content:flex-end;">
+          <div style="width:280px;">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>Total HT</span><span>${fmt(currentDevis?.t?.ht||0)} €</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>TVA ${currentDevis?.tvaRate||10}%</span><span>${fmt(currentDevis?.t?.tva||0)} €</span></div>
+            <div style="display:flex;justify-content:space-between;background:#2d6e3e;color:white;padding:12px;border-radius:6px;margin-top:6px;"><span>TOTAL TTC</span><span style="font-size:18px;font-weight:700;">${fmt(currentDevis?.t?.ttc||0)} €</span></div>
+            ${currentDevis?.acompteRate>0?`<div style="display:flex;justify-content:space-between;padding:8px;background:#f0f8f0;border-radius:6px;margin-top:6px;font-size:13px;border-left:3px solid #2d6e3e;"><span>Acompte ${currentDevis.acompteRate}%</span><span style="font-weight:700;color:#2d6e3e;">${fmt((currentDevis?.t?.ttc||0)*currentDevis.acompteRate/100)} €</span></div>`:''}
+          </div>
         </div>
-        <div style="padding:16px;background:#eee;border-radius:0 0 8px 8px;font-size:12px;color:#666;">
-          <strong>Loire Amenagement</strong> · ${SOC.adresse} · ${SOC.tel} · ${SOC.email}
+
+        <!-- RIB -->
+        <div style="padding:14px 20px;background:#f5f0e8;border:1px solid #eee;border-top:none;font-size:12px;color:#666;line-height:1.8;">
+          <div style="font-weight:600;color:#8a7a5a;letter-spacing:.1em;font-size:10px;margin-bottom:6px;">REGLEMENT</div>
+          <div>IBAN: ${SOC.iban} · BIC: ${SOC.bic}</div>
+          <div>Acompte à la commande: <strong style="color:#2d6e3e;">${fmt((currentDevis?.t?.ttc||0)*((currentDevis?.acompteRate||30)/100))} € TTC</strong></div>
         </div>
+
+        <!-- SIGNATURE CLIENT -->
+        ${sigHtml?`<div style="padding:14px 20px;background:#fff;border:1px solid #eee;border-top:none;">
+          <div style="font-size:10px;color:#888;letter-spacing:.1em;margin-bottom:8px;">SIGNATURE CLIENT</div>
+          ${sigHtml}
+        </div>`:''}
+
+        <!-- PIED -->
+        <div style="padding:14px 20px;background:#eee;border-radius:0 0 8px 8px;font-size:11px;color:#666;border:1px solid #ddd;border-top:none;">
+          <strong>${SOC.nom}</strong> · ${SOC.adresse} · ${SOC.tel} · ${SOC.email}
+        </div>
+
       </div>
     </body></html>`;
 
