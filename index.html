@@ -588,6 +588,14 @@ function goStep(n) {
 
 // CHAPITRES & CATALOGUE
 
+const CHAP_LIB = [
+  "Acces et allee","Arrosage et drainage","Cloture et portail",
+  "Demolition et depose","Eclairage exterieur","Espaces verts et plantations",
+  "Fondations et maconnerie","Installation de chantier","Jardin et paysagement",
+  "Revetement et dallage","Terrasse","Terrassement","Travaux preparatoires",
+  "Vegetalisation","Repli de chantier"
+];
+
 let activeChapId = null; // id du chapitre actif pour ajout prestation
 let ficheItem = null;    // prestation en cours de fiche
 
@@ -772,18 +780,16 @@ function validerFiche() {
   const qte = parseFloat(document.getElementById('fiche-qte').value)||1;
   const prix = parseFloat(document.getElementById('fiche-prix').value)||0;
   const newLigne = {id:uid(), type:'prestation', ref:ficheItem.id, label:ficheItem.designation, unite:ficheItem.unite, qte, prix, rl:0, prixMin:ficheItem.prixMin, prixMax:ficheItem.prixMax};
-  // Inserer apres le chapitre actif (et ses prestations) ou a la fin
+  // Inserer apres le chapitre actif (compatible Safari)
   if(activeChapId) {
-    const idx = lignes.findLastIndex(l=>l.id===activeChapId||(lignes.findIndex(x=>x.id===activeChapId)<lignes.indexOf(l)&&l.type!=='chapter'));
-    // Find position: after last prestation of active chap
-    let insertIdx = lignes.length;
     const chapIdx = lignes.findIndex(l=>l.id===activeChapId);
     if(chapIdx !== -1) {
-      let i = chapIdx+1;
-      while(i<lignes.length && lignes[i].type!=='chapter') i++;
-      insertIdx = i;
+      let insertIdx = chapIdx + 1;
+      while(insertIdx < lignes.length && lignes[insertIdx].type !== 'chapter') insertIdx++;
+      lignes.splice(insertIdx, 0, newLigne);
+    } else {
+      lignes.push(newLigne);
     }
-    lignes.splice(insertIdx, 0, newLigne);
   } else {
     lignes.push(newLigne);
   }
