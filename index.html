@@ -754,23 +754,19 @@ async function envoyerDevis() {
       </div>
     </body></html>`;
 
-    // Build RFC 2822 email
+    // Build RFC 2822 email with proper base64 HTML encoding
     const boundary = 'LA_DEVIS_' + Date.now();
-    const emailLines = [
+    const htmlBase64 = btoa(unescape(encodeURIComponent(htmlBody)));
+    const rawEmail = [
       'From: Loire Amenagement <' + (gUserEmail||'me') + '>',
       'To: ' + email,
       'Subject: =?UTF-8?B?' + btoa(unescape(encodeURIComponent(subject))) + '?=',
       'MIME-Version: 1.0',
-      'Content-Type: multipart/mixed; boundary="' + boundary + '"',
-      '',
-      '--' + boundary,
       'Content-Type: text/html; charset=UTF-8',
-      'Content-Transfer-Encoding: quoted-printable',
+      'Content-Transfer-Encoding: base64',
       '',
-      htmlBody,
-      '--' + boundary + '--'
-    ];
-    const rawEmail = emailLines.join('\r\n');
+      htmlBase64
+    ].join('\r\n');
     const encodedEmail = btoa(unescape(encodeURIComponent(rawEmail)))
       .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 
