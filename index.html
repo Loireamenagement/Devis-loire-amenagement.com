@@ -622,7 +622,6 @@ function captureSig() {
   if(canvas) sigData = canvas.toDataURL();
 }
 
-  initSigCanvas();
   showScreen('accueil');
 }
 
@@ -646,7 +645,12 @@ function goStep(n) {
   const titleEl = document.querySelector('#s-nouveau .screen-title');
   if(stepsEl) stepsEl.style.display = n===3 ? 'none' : 'flex';
   if(titleEl) titleEl.style.display = n===3 ? 'none' : 'block';
-  if(n===4) { setTimeout(resizeSigCanvas, 100); }
+  if(n===4) {
+    setTimeout(()=>{
+      if(!sigCtx) initSigCanvas();
+      resizeSigCanvas();
+    }, 200);
+  }
   if(n===5) {document.getElementById('send-email').value=document.getElementById('cli-email').value;}
   for(let i=1;i<=5;i++) {
     document.getElementById('step-content-'+i).classList.toggle('hidden',i!==n);
@@ -936,10 +940,7 @@ function buildApercu() {
   `;
 }
 
-function captureSig() {
-  const canvas = document.getElementById('sig-canvas');
-  if(canvas) sigData = canvas.toDataURL();
-}
+
 
 function buildPrintArea() {
   if(!currentDevis) return;
