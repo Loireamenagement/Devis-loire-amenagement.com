@@ -360,21 +360,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
 
     <!-- STEP 4: SIGNATURE -->
-    <div id="step-content-4" class="hidden" style="overflow:hidden;">
+    <div id="step-content-4" class="hidden">
       <div class="card">
-        <div class="card-title">Signature du client</div>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">
-          Demandez au client de signer ici avec son doigt
-        </p>
-        <canvas id="sig-canvas" class="sig-canvas" height="180"></canvas>
-        <div class="sig-hint">Signez dans le cadre ci-dessus</div>
-        <div class="btn-row" style="margin-top:12px;">
-          <button class="btn btn-secondary" onclick="clearSig()">Effacer</button>
-          <button class="btn btn-primary" style="flex:1;" onclick="goStep(5)">Valider la signature</button>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Le client doit signer dans le cadre ci-dessous.</p>
+        <button class="btn btn-primary btn-full" onclick="openSigOverlay()">Ouvrir le pad de signature</button>
+        <div id="sig-preview" style="margin-top:12px;display:none;">
+          <div style="font-size:12px;color:var(--vert);margin-bottom:6px;">Signature enregistree</div>
+          <img id="sig-preview-img" style="max-height:80px;border:1px solid var(--border);border-radius:var(--r2);padding:4px;">
+          <button onclick="openSigOverlay()" class="btn btn-secondary" style="margin-top:8px;width:100%;font-size:12px;">Recommencer</button>
         </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="goStep(3)">Retour</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goStep(5)">Valider et envoyer</button>
+      </div>
+    </div>
+
+    <!-- OVERLAY SIGNATURE PLEIN ECRAN -->
+    <div id="sig-overlay" style="display:none;position:fixed;inset:0;background:#fff;z-index:999;flex-direction:column;">
+      <div style="background:linear-gradient(to right,#1a3a2a,#2d6e3e);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <span style="color:white;font-size:14px;font-weight:600;">Signature client</span>
+        <button onclick="closeSigOverlay(false)" style="background:rgba(255,255,255,.2);border:none;color:white;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;">Annuler</button>
+      </div>
+      <div style="padding:16px;flex-shrink:0;font-size:13px;color:#555;">
+        Signez dans le cadre blanc ci-dessous avec votre doigt
+      </div>
+      <div style="flex:1;padding:0 16px;display:flex;flex-direction:column;">
+        <canvas id="sig-canvas" style="flex:1;width:100%;background:#fafafa;border:2px dashed #ccc;border-radius:8px;touch-action:none;display:block;cursor:crosshair;-webkit-user-select:none;user-select:none;"></canvas>
+      </div>
+      <div style="padding:16px;display:flex;gap:10px;flex-shrink:0;">
+        <button onclick="clearSig()" class="btn btn-secondary" style="flex:1;">Effacer</button>
+        <button onclick="closeSigOverlay(true)" class="btn btn-primary" style="flex:2;">Valider la signature</button>
       </div>
     </div>
 
@@ -663,6 +679,71 @@ function nouveauDevis() {
 
 
 // SIGNATURE CANVAS
+function openSigOverlay() {
+  const overlay = document.getElementById('sig-overlay');
+  overlay.style.display = 'flex';
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  // Init canvas after display
+  setTimeout(()=>{
+    const canvas = document.getElementById('sig-canvas');
+    const container = canvas.parentElement;
+    canvas.width  = container.clientWidth;
+    canvas.height = container.clientHeight;
+    sigCtx = canvas.getContext('2d');
+    sigCtx.strokeStyle = '#1a2e1a';
+    sigCtx.lineWidth   = 2.5;
+    sigCtx.lineCap     = 'round';
+    sigCtx.lineJoin    = 'round';
+    sigCtx.clearRect(0, 0, canvas.width, canvas.height);
+    sigData = null;
+    attachSigEvents(canvas);
+  }, 100);
+}
+
+function closeSigOverlay(save) {
+  if(save) {
+    captureSig();
+    // Show preview
+    const prev = document.getElementById('sig-preview');
+    const img  = document.getElementById('sig-preview-img');
+    if(prev && img && sigData) {
+      img.src = sigData;
+      prev.style.display = 'block';
+    }
+    showToast('Signature enregistree');
+  }
+  document.getElementById('sig-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function attachSigEvents(canvas) {
+  // Remove old listeners by cloning
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  sigCtx = newCanvas.getContext('2d');
+  sigCtx.strokeStyle = '#1a2e1a';
+  sigCtx.lineWidth   = 2.5;
+  sigCtx.lineCap     = 'round';
+  sigCtx.lineJoin    = 'round';
+
+  let drawing = false, lastX = 0, lastY = 0;
+
+  function pos(e) {
+    const r = newCanvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return [(t.clientX - r.left) * (newCanvas.width / r.width),
+            (t.clientY - r.top)  * (newCanvas.height / r.height)];
+  }
+  newCanvas.addEventListener('mousedown',  e=>{ drawing=true;  [lastX,lastY]=pos(e); });
+  newCanvas.addEventListener('mousemove',  e=>{ if(!drawing) return; const [x,y]=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(x,y); sigCtx.stroke(); [lastX,lastY]=[x,y]; });
+  newCanvas.addEventListener('mouseup',    ()=>drawing=false);
+  newCanvas.addEventListener('touchstart', e=>{ e.preventDefault(); e.stopPropagation(); drawing=true;  [lastX,lastY]=pos(e); }, {passive:false});
+  newCanvas.addEventListener('touchmove',  e=>{ e.preventDefault(); e.stopPropagation(); if(!drawing) return; const [x,y]=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(x,y); sigCtx.stroke(); [lastX,lastY]=[x,y]; }, {passive:false});
+  newCanvas.addEventListener('touchend',   e=>{ e.preventDefault(); drawing=false; }, {passive:false});
+}
+
+
 let sigCtx = null, sigDrawing = false, sigLastX = 0, sigLastY = 0;
 let sigData = null;
 
@@ -725,7 +806,7 @@ function clearSig() {
 
 function captureSig() {
   const canvas = document.getElementById('sig-canvas');
-  if(canvas) sigData = canvas.toDataURL();
+  if(canvas) sigData = canvas.toDataURL('image/png');
 }
 
   showScreen('accueil');
