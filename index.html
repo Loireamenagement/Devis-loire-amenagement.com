@@ -549,6 +549,25 @@ if(sessionStorage.getItem('la_auth')==='1') {
   document.getElementById('app').classList.remove('hidden');
   initApp();
 }
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if(!key) { showToast('Entrez une cle API'); return; }
+  localStorage.setItem('la_apikey', key);
+  showToast('Cle API enregistree');
+}
+
+function saveEmailJS() {
+  const svc = document.getElementById('ejs-service').value.trim();
+  const tpl = document.getElementById('ejs-template').value.trim();
+  const key = document.getElementById('ejs-pubkey').value.trim();
+  if(!svc || !tpl || !key) { showToast('Remplissez tous les champs EmailJS'); return; }
+  localStorage.setItem('ejs_service',  svc);
+  localStorage.setItem('ejs_template', tpl);
+  localStorage.setItem('ejs_pubkey',   key);
+  showToast('EmailJS configure');
+}
+
+
 function logout() {
   sessionStorage.removeItem('la_auth');
   location.reload();
