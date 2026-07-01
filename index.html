@@ -574,6 +574,8 @@ function initApp() {
   document.getElementById('ejs-template').value = localStorage.getItem('ejs_template')||'';
   document.getElementById('ejs-pubkey').value   = localStorage.getItem('ejs_pubkey')||'';
   // Signature canvas
+  showScreen('accueil');
+}
 
 // SAUVEGARDE & ENVOI
 function sauvegarderDevis() {
@@ -748,7 +750,6 @@ function attachSigEvents(canvas) {
 
 
 let sigCtx = null, sigDrawing = false, sigLastX = 0, sigLastY = 0;
-let sigData = null;
 
 function resizeSigCanvas() {
   const canvas = document.getElementById('sig-canvas');
@@ -810,9 +811,6 @@ function clearSig() {
 function captureSig() {
   const canvas = document.getElementById('sig-canvas');
   if(canvas) sigData = canvas.toDataURL('image/png');
-}
-
-  showScreen('accueil');
 }
 
 // ── SCREENS ────────────────────────────────────
