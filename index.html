@@ -98,7 +98,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .total-ttc-val{font-size:24px;font-weight:700;}
 
 /* ── SIGNATURE ── */
-.sig-canvas{border:2px dashed var(--border);border-radius:var(--r2);width:100%;touch-action:none;display:block;background:#fafafa;}
+.sig-canvas{border:2px dashed var(--border);border-radius:var(--r2);width:100%;touch-action:none;display:block;background:#fafafa;cursor:crosshair;-webkit-user-select:none;user-select:none;}
 .sig-hint{font-size:12px;color:var(--text3);text-align:center;margin-top:6px;}
 
 /* ── TABS ── */
@@ -360,7 +360,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
 
     <!-- STEP 4: SIGNATURE -->
-    <div id="step-content-4" class="hidden">
+    <div id="step-content-4" class="hidden" style="overflow:hidden;">
       <div class="card">
         <div class="card-title">Signature du client</div>
         <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">
@@ -558,6 +558,110 @@ function initApp() {
   document.getElementById('ejs-pubkey').value   = localStorage.getItem('ejs_pubkey')||'';
   // Signature canvas
 
+// SAUVEGARDE & ENVOI
+function sauvegarderDevis() {
+  if(!currentDevis) { showToast('Completez le devis avant de sauvegarder'); return; }
+  captureSig();
+  currentDevis.sigClient = sigData;
+  currentDevis.savedAt = new Date().toISOString();
+  devisList = devisList.filter(d=>d.num !== currentDevis.num);
+  devisList.unshift(currentDevis);
+  localStorage.setItem('la_devis', JSON.stringify(devisList));
+  renderDevisList();
+  showToast('Devis sauvegarde');
+}
+
+function renderDevisList() {
+  const el = document.getElementById('devis-list');
+  if(!el) return;
+  if(!devisList.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">📋</div><div>Aucun devis</div><div style="font-size:12px;margin-top:6px;">Cliquez + Devis pour commencer</div></div>';
+    return;
+  }
+  el.innerHTML = devisList.map(d=>`
+    <div class="card" style="cursor:pointer;" onclick="ouvrirDevis('${d.num}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;">${escHtml(d.cli?.nom||'-')}</div>
+          <div style="font-size:11px;color:var(--text3);">${d.num} · ${fmtDate(d.date1)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:18px;font-weight:700;color:var(--vert)">${fmt(d.t?.ttc||0)} E</div>
+          <div style="font-size:11px;color:var(--text3);">TTC</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function envoyerDevis() {
+  captureSig();
+  if(currentDevis) { currentDevis.sigClient = sigData; }
+  const email = document.getElementById('send-email').value;
+  if(!email) { showToast('Entrez un email client'); return; }
+  const svcId    = localStorage.getItem('ejs_service');
+  const tplId    = localStorage.getItem('ejs_template');
+  const pubKey   = localStorage.getItem('ejs_pubkey');
+  const statusEl = document.getElementById('send-status');
+  if(!svcId || !tplId || !pubKey) {
+    statusEl.innerHTML = '<span style="color:#e53935;">Configurez EmailJS dans Reglages</span>';
+    return;
+  }
+  statusEl.textContent = 'Envoi en cours...';
+  try {
+    if(!window.emailjs) {
+      await new Promise((res,rej)=>{
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+      emailjs.init(pubKey);
+    }
+    const msg = document.getElementById('send-msg').value || 'Veuillez trouver ci-joint votre devis.';
+    await emailjs.send(svcId, tplId, {
+      to_email:    email,
+      to_name:     currentDevis?.cli?.nom || '',
+      from_name:   'Loire Amenagement',
+      devis_num:   currentDevis?.num || '',
+      montant_ttc: fmt(currentDevis?.t?.ttc||0)+' E TTC',
+      message:     msg,
+      reply_to:    'contact@loire-amenagement.com',
+    });
+    statusEl.innerHTML = '<span style="color:#2d6e3e;font-weight:600;">Email envoye avec succes !</span>';
+    sauvegarderDevis();
+  } catch(e) {
+    statusEl.innerHTML = '<span style="color:#e53935;">Erreur: '+(e.text||e.message||'inconnue')+'</span>';
+  }
+}
+
+function imprimerDevis() {
+  captureSig();
+  if(currentDevis) { currentDevis.sigClient = sigData; }
+  buildPrintArea();
+  window.print();
+}
+
+function nouveauDevis() {
+  lignes = []; sigData = null; currentDevis = null;
+  activeChapId = null;
+  ['cli-nom','cli-adresse','cli-cp','cli-ville','cli-email','cli-tel','cli-desc','send-msg'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('devis-acompte').value = '30';
+  document.getElementById('devis-tva').value = '10';
+  document.getElementById('send-status').textContent = '';
+  const today = new Date().toISOString().split('T')[0];
+  const in15  = new Date(Date.now()+15*86400000).toISOString().split('T')[0];
+  document.getElementById('devis-date').value  = today;
+  document.getElementById('devis-valid').value = in15;
+  if(sigCtx) clearSig();
+  renderLignes();
+  goStep(1);
+  showScreen('nouveau');
+}
+
+
 // SIGNATURE CANVAS
 let sigCtx = null, sigDrawing = false, sigLastX = 0, sigLastY = 0;
 let sigData = null;
@@ -590,7 +694,9 @@ function initSigCanvas() {
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const src = e.touches ? e.touches[0] : e;
-    return [src.clientX - rect.left, src.clientY - rect.top];
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return [(src.clientX - rect.left) * scaleX, (src.clientY - rect.top) * scaleY];
   }
   canvas.addEventListener('mousedown', e => { sigDrawing=true; [sigLastX,sigLastY]=getPos(e); });
   canvas.addEventListener('mousemove', e => {
