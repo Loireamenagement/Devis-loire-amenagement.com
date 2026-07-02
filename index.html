@@ -508,6 +508,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="toast" id="toast"></div>
 
 <script>
+
+
+
+
+
+
 // ── CONSTANTES ──────────────────────────────────
 const PWD = 'loire2024';
 const LOGO = 'data:image/jpeg;base64,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';
@@ -521,480 +527,7 @@ const SOC = {
   email:'contact@loire-amenagement.com',
   iban:'FR76 1027 8361 6000 0118 8410 139', bic:'CMCIFR2A'
 };
-const CATALOGUE = [{"id": "2nmb63om", "designation": "Clôture panneaux rigides H1M78 plaque béton 25cm RAL 7016, poteaux alu scellés béton, grillage 5mm", "categorie": "Clôture / Portail", "unite": "ml", "occurrences": 5, "prixMin": 81.55, "prixMoy": 89.81, "prixMax": 101.73}, {"id": "m2qrovfv", "designation": "Réservation Elec - tranchée, fourreau TPC DN50, enrobage sable, remblaiement compactage", "categorie": "Réseaux", "unite": "ENS", "occurrences": 5, "prixMin": 22.66, "prixMoy": 425.37, "prixMax": 659.59}, {"id": "upmvzmww", "designation": "Mise à niveau ouvrages divers (DEP, regards assainissement, etc.)", "categorie": "Réseaux divers", "unite": "U", "occurrences": 5, "prixMin": 76.55, "prixMoy": 94.85, "prixMax": 122.63}, {"id": "stv6c1lq", "designation": "Terrasse grès cérame structure autoportante, dalles 120x30cm ep.20mm R11, double lambourdage alu OMEGA", "categorie": "Revêtement / Dallage", "unite": "m2", "occurrences": 4, "prixMin": 188.58, "prixMoy": 212.74, "prixMax": 252.09}, {"id": "9cgrccpt", "designation": "Chaînettes pavés pierre naturelle sur fondation béton, joints mortier teinté", "categorie": "Maçonnerie / Terrassement", "unite": "ml", "occurrences": 4, "prixMin": 42.28, "prixMoy": 53.58, "prixMax": 69.79}, {"id": "jvgt2bb7", "designation": "Chaînettes pavés pierre naturelle ou reconstituée sur fondation béton, joints teintés", "categorie": "Revêtement / Dallage", "unite": "ml", "occurrences": 4, "prixMin": 45.66, "prixMoy": 49.04, "prixMax": 50.18}, {"id": "l2dvz44h", "designation": "Enrobé 0/6 noir 125kg/m2 (5cm)", "categorie": "Bordures et revêtement", "unite": "m2", "occurrences": 4, "prixMin": 22.62, "prixMoy": 28.7, "prixMax": 31.16}, {"id": "t2mgynw8", "designation": "Installation digicode SEWOSKY 1000 filaire", "categorie": "Clôture / Portail", "unite": "forfait", "occurrences": 3, "prixMin": 178.73, "prixMoy": 183.78, "prixMax": 186.3}, {"id": "d38o0ie6", "designation": "Semelle filante portail coulissant - coffrage, ferraillage, béton BPS XF1 ep.20cm, passage gaines", "categorie": "Maçonnerie", "unite": "ENS", "occurrences": 3, "prixMin": 819.63, "prixMoy": 1271.51, "prixMax": 1497.45}, {"id": "cu8jq0y7", "designation": "Bordures béton type P1 - fourniture pose bordure 8x20, fondation béton, joints mortier", "categorie": "Maçonnerie / Terrassement", "unite": "ml", "occurrences": 2, "prixMin": 44.51, "prixMoy": 53.53, "prixMax": 62.55}, {"id": "h6nhhvc9", "designation": "Dalle béton ferraillé BPS XF1 C25/30 ep.12cm avec film poliane et coffrage", "categorie": "Maçonnerie", "unite": "m2", "occurrences": 2, "prixMin": 47.69, "prixMoy": 49.57, "prixMax": 51.45}, {"id": "yqqqtdpn", "designation": "Massifs fondation - fouilles, béton BPS XC1 C25/30 ferraillé", "categorie": "Maçonnerie", "unite": "u", "occurrences": 2, "prixMin": 87.5, "prixMoy": 93.96, "prixMax": 100.41}, {"id": "8k0il658", "designation": "Engazonnement et roulage", "categorie": "Végétalisation", "unite": "m2", "occurrences": 2, "prixMin": 7.46, "prixMoy": 10.62, "prixMax": 13.78}, {"id": "xdalz86x", "designation": "Démolition dalle béton, chargement et évacuation gravats", "categorie": "Démolition", "unite": "ENS", "occurrences": 2, "prixMin": 37.71, "prixMoy": 104.4, "prixMax": 171.09}, {"id": "1l31j18b", "designation": "Habillage rives et retombées terrasse - profils de finitions en rive", "categorie": "Terrasse", "unite": "ml", "occurrences": 2, "prixMin": 81.0, "prixMoy": 84.75, "prixMax": 88.49}, {"id": "uf95in6e", "designation": "Apport mise oeuvre terre végétale sur 15cm pour engazonnement", "categorie": "Espaces verts", "unite": "m2", "occurrences": 2, "prixMin": 18.24, "prixMoy": 18.24, "prixMax": 18.24}, {"id": "rtz0h4nd", "designation": "Fourniture pose couvertine aluminium pliée en continu sur place", "categorie": "Maçonnerie", "unite": "ml", "occurrences": 2, "prixMin": 37.38, "prixMoy": 37.38, "prixMax": 37.38}, {"id": "dlt1uuj6", "designation": "Paillage écorce de pin naturel", "categorie": "Végétalisation", "unite": "m2", "occurrences": 2, "prixMin": 22.02, "prixMoy": 22.02, "prixMax": 22.02}, {"id": "l2rao7l3", "designation": "Pavage Kahn serie K korten M309 ep.6cm, joints sable polymère", "categorie": "Revêtements", "unite": "m2", "occurrences": 2, "prixMin": 164.77, "prixMoy": 171.99, "prixMax": 179.22}, {"id": "d0vqgvu0", "designation": "Décapage surface à haute pression", "categorie": "Préparation support", "unite": "ENS", "occurrences": 2, "prixMin": 45.42, "prixMoy": 113.55, "prixMax": 181.68}, {"id": "vy02aps3", "designation": "Alimentation électrique depuis prise extérieure existante", "categorie": "Éclairage", "unite": "forfait", "occurrences": 1, "prixMin": 110.0, "prixMoy": 110.0, "prixMax": 110.0}, {"id": "ykge4m0o", "designation": "Regard de puisage PVC sous robinet extérieur", "categorie": "Arrosage / Drainage", "unite": "forfait", "occurrences": 1, "prixMin": 158.07, "prixMoy": 158.07, "prixMax": 158.07}, {"id": "5irkwyyi", "designation": "Clôture panneaux rigides H1M98 plaque béton 50cm RAL 7016, poteaux alu scellés", "categorie": "Clôture / Portail", "unite": "ml", "occurrences": 1, "prixMin": 108.24, "prixMoy": 108.24, "prixMax": 108.24}, {"id": "zk4xq0l2", "designation": "Semelle filante portail coulissant - coffrage, ferraillage, béton BPS XF1 ep.25cm", "categorie": "Maçonnerie / Terrassement", "unite": "forfait", "occurrences": 1, "prixMin": 1270.68, "prixMoy": 1270.68, "prixMax": 1270.68}, {"id": "2txc91ok", "designation": "Portail coulissant motorisé 5m H1800mm alu laqué RAL 7016, lames 200mm, DEA Kit 624, kit batterie", "categorie": "Clôture / Portail", "unite": "u", "occurrences": 1, "prixMin": 5687.92, "prixMoy": 5687.92, "prixMax": 5687.92}, {"id": "3ev9h272", "designation": "Visiophone Gates mini Zen", "categorie": "Autre", "unite": "u", "occurrences": 1, "prixMin": 915.4, "prixMoy": 915.4, "prixMax": 915.4}, {"id": "kr9gq9fc", "designation": "Clôture aluminium thermolaqué RAL 7016 lames 200mm H808mm, poteaux platine vissée", "categorie": "Clôture / Portail", "unite": "u", "occurrences": 1, "prixMin": 5060.5, "prixMoy": 5060.5, "prixMax": 5060.5}, {"id": "fieg2kzb", "designation": "Couvertines aluminium laqué RAL 7016 sablé, pliées sur place, pose clipsée", "categorie": "Clôture / Portail", "unite": "u", "occurrences": 1, "prixMin": 845.25, "prixMoy": 845.25, "prixMax": 845.25}, {"id": "butq898d", "designation": "Remise en état jardin, repliement", "categorie": "Main d'oeuvre", "unite": "forfait", "occurrences": 1, "prixMin": 230.0, "prixMoy": 230.0, "prixMax": 230.0}, {"id": "fo9dh29q", "designation": "Piliers maçonnés H1500mm boisseaux 30x30x20", "categorie": "Maçonnerie / Terrassement", "unite": "u", "occurrences": 1, "prixMin": 311.78, "prixMoy": 311.78, "prixMax": 311.78}, {"id": "mcy3khrr", "designation": "Clôture lames aluminium gris 7016, soubassement béton, 12 lames 15cm, poteaux H2m60", "categorie": "Clôture / Portail", "unite": "ml", "occurrences": 1, "prixMin": 401.12, "prixMoy": 401.12, "prixMax": 401.12}, {"id": "3qqjr68w", "designation": "Béton désactivé granulats 6/11 rose de provence, teinté ocre, fibré", "categorie": "Revêtement / Dallage", "unite": "m2", "occurrences": 1, "prixMin": 81.62, "prixMoy": 81.62, "prixMax": 81.62}, {"id": "nwhv80o0", "designation": "Grille eaux pluviales 300x300", "categorie": "Arrosage / Drainage", "unite": "u", "occurrences": 1, "prixMin": 84.7, "prixMoy": 84.7, "prixMax": 84.7}, {"id": "sc10vhrr", "designation": "Pavage pierre naturelle fondation sable ciment fibré ep.5cm", "categorie": "Revêtement / Dallage", "unite": "m2", "occurrences": 1, "prixMin": 210.02, "prixMoy": 210.02, "prixMax": 210.02}, {"id": "gyba4car", "designation": "Tranchées drainantes - drain DN90 géotextile, grave drainante 10/14", "categorie": "Arrosage / Drainage", "unite": "ml", "occurrences": 1, "prixMin": 43.99, "prixMoy": 43.99, "prixMax": 43.99}, {"id": "h0zar879", "designation": "Bicouche beige - émulsion bitume gravillonnée 2 couches, gravier 6/10 et finition 4/6", "categorie": "Revêtement / Dallage", "unite": "m2", "occurrences": 1, "prixMin": 15.16, "prixMoy": 15.16, "prixMax": 15.16}, {"id": "nyn41473", "designation": "Clôture panneaux rigides H1M48 plaque béton 25cm RAL 7016, poteaux alu scellés", "categorie": "Clôture / Portail", "unite": "ml", "occurrences": 1, "prixMin": 148.1, "prixMoy": 148.1, "prixMax": 148.1}, {"id": "96azr5mv", "designation": "Portillon acier grillagé largeur 1m H1m53, occultable lames", "categorie": "Clôture / Portail", "unite": "u", "occurrences": 1, "prixMin": 594.91, "prixMoy": 594.91, "prixMax": 594.91}, {"id": "tma26k3z", "designation": "Plantation haie Photinia Red Robin conteneur 35L 150/175", "categorie": "Végétaux / Plantations", "unite": "ml", "occurrences": 1, "prixMin": 71.27, "prixMoy": 71.27, "prixMax": 71.27}, {"id": "dvb8jdwy", "designation": "Traverses paysagères chêne brut pour bordures", "categorie": "Fournitures / Matériaux", "unite": "ml", "occurrences": 1, "prixMin": 43.05, "prixMoy": 43.05, "prixMax": 43.05}, {"id": "lx4p815u", "designation": "Grave calcaire 0/10 stabilisée - sable calcaire naturel, compactage et nivellement", "categorie": "Fournitures / Matériaux", "unite": "m2", "occurrences": 1, "prixMin": 16.07, "prixMoy": 16.07, "prixMax": 16.07}, {"id": "2hu2d3xv", "designation": "Clôture bois composite Traumgarten H180cm, poteaux alu rainuré, lames Classic, soubassement béton", "categorie": "Clôture / Portail", "unite": "ml", "occurrences": 1, "prixMin": 260.08, "prixMoy": 260.08, "prixMax": 260.08}, {"id": "fyadcmle", "designation": "Enlèvement haie - tronçonnage, dessouchage, évacuation, broyage", "categorie": "Végétaux / Plantations", "unite": "ml", "occurrences": 1, "prixMin": 55.9, "prixMoy": 55.9, "prixMax": 55.9}, {"id": "3l898jdf", "designation": "Portail battant 2 vantaux L4000xH1400mm, motorisation DEA Geko Pro 24V, photocellules", "categorie": "Clôture / Portail", "unite": "forfait", "occurrences": 1, "prixMin": 6103.62, "prixMoy": 6103.62, "prixMax": 6103.62}, {"id": "13yhx4ae", "designation": "Portillon battant L1000xH1400mm, serrure inox, poignée inox", "categorie": "Clôture / Portail", "unite": "forfait", "occurrences": 1, "prixMin": 2022.26, "prixMoy": 2022.26, "prixMax": 2022.26}, {"id": "woo0qodr", "designation": "Portillon battant L975xH1990mm, serrure inox, poignée inox", "categorie": "Clôture / Portail", "unite": "forfait", "occurrences": 1, "prixMin": 1910.56, "prixMoy": 1910.56, "prixMax": 1910.56}, {"id": "b5643eqe", "designation": "Engazonnement mécanisé 40g/m2, roulage", "categorie": "Végétaux / Plantations", "unite": "m2", "occurrences": 1, "prixMin": 2.43, "prixMoy": 2.43, "prixMax": 2.43}, {"id": "mfcv9j1s", "designation": "Installation de chantier - amenées replis matériel, déchetterie", "categorie": "Organisation chantier", "unite": "ENS", "occurrences": 1, "prixMin": 145.47, "prixMoy": 145.47, "prixMax": 145.47}, {"id": "g1dyjr3r", "designation": "Résine granulats de marbre - surface horizontale, finition lissée", "categorie": "Revêtement résine", "unite": "m2", "occurrences": 1, "prixMin": 158.77, "prixMoy": 158.77, "prixMax": 158.77}, {"id": "vqp88bwf", "designation": "Résine granulats de marbre - contremarches et parois de murs", "categorie": "Revêtement résine", "unite": "m2", "occurrences": 1, "prixMin": 340.77, "prixMoy": 340.77, "prixMax": 340.77}, {"id": "aw4knzy8", "designation": "Terrasse bois exotique Muiracatiara - lambourdage 60x40mm, lames 145x21mm, DTU 51-4", "categorie": "Terrasse bois", "unite": "m2", "occurrences": 1, "prixMin": 184.48, "prixMoy": 184.48, "prixMax": 184.48}, {"id": "zg2fiuh4", "designation": "Dalle béton ferraillé BPS XF1 C25/30 ep.12cm, film poliane, coffrage", "categorie": "Maçonnerie", "unite": "m2", "occurrences": 1, "prixMin": 79.72, "prixMoy": 79.72, "prixMax": 79.72}, {"id": "nbvrddol", "designation": "Dallage céramique ep.20mm format 60x60cm sur plots réglables", "categorie": "Revêtement de sol", "unite": "m2", "occurrences": 1, "prixMin": 141.74, "prixMoy": 141.74, "prixMax": 141.74}, {"id": "kif41lgf", "designation": "Décapage terre végétale stockée pour réemploi", "categorie": "Terrassement", "unite": "m2", "occurrences": 1, "prixMin": 5.75, "prixMoy": 5.75, "prixMax": 5.75}, {"id": "2wtb4892", "designation": "Évacuation terre végétale excédentaire", "categorie": "Terrassement", "unite": "m3", "occurrences": 1, "prixMin": 94.64, "prixMoy": 94.64, "prixMax": 94.64}, {"id": "gro3nlzj", "designation": "Portail coulissant refoulement droite L4000xH1400mm, lames 195mm, rail alu, galets inox", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 4726.66, "prixMoy": 4726.66, "prixMax": 4726.66}, {"id": "2gfrvchk", "designation": "Rognage souche mécanisé", "categorie": "Démolition / Préparation", "unite": "u", "occurrences": 1, "prixMin": 143.75, "prixMoy": 143.75, "prixMax": 143.75}, {"id": "shjpqvb3", "designation": "Portail double battant manuel 3500x1800mm, lames alu horizontales, poteaux alu 180x180mm RAL 7016", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 6481.53, "prixMoy": 6481.53, "prixMax": 6481.53}, {"id": "7nka4ejh", "designation": "Portail double battant alu soudé thermolaqué 3m50 H1600mm, lames 200mm, DEA Geko Pro 24V RAL 5023", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 7197.18, "prixMoy": 7197.18, "prixMax": 7197.18}, {"id": "8dt9jas9", "designation": "Couche de forme réglage pentes - GNT B 0/20, compactage", "categorie": "Terrassement", "unite": "m2", "occurrences": 1, "prixMin": 12.98, "prixMoy": 12.98, "prixMax": 12.98}, {"id": "sf88j7qs", "designation": "Regard grille 40x40 classe C250 - fourniture, pose, raccordement gouttières", "categorie": "Assainissement", "unite": "u", "occurrences": 1, "prixMin": 322.16, "prixMoy": 322.16, "prixMax": 322.16}, {"id": "aw470v6k", "designation": "Dallage pierre naturelle Travertin Opus 4 formats, joint mortier teinté", "categorie": "Bordures et Dallages", "unite": "m2", "occurrences": 1, "prixMin": 269.38, "prixMoy": 269.38, "prixMax": 269.38}, {"id": "ncc1reix", "designation": "Trappe visite pierre naturelle Travertin 50x50cm ep.3cm", "categorie": "Bordures et Dallages", "unite": "ENS", "occurrences": 1, "prixMin": 137.74, "prixMoy": 137.74, "prixMax": 137.74}, {"id": "msa1zhz8", "designation": "Paillage paillettes ardoise verte 40/70", "categorie": "Travaux paysagers", "unite": "m2", "occurrences": 1, "prixMin": 18.5, "prixMoy": 18.5, "prixMax": 18.5}, {"id": "ha4i815k", "designation": "Dégagement emprises avant intervention clôture", "categorie": "Clôtures", "unite": "ENS", "occurrences": 1, "prixMin": 414.0, "prixMoy": 414.0, "prixMax": 414.0}, {"id": "7xcolpb0", "designation": "Portail coulissant L3500xH1800mm, lames 200mm, DEA Kit 624 avec batterie", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 5093.0, "prixMoy": 5093.0, "prixMax": 5093.0}, {"id": "ax1at8ma", "designation": "Muret parpaings creux 20cm, chainage, enduit monocouche 2 faces, H~60cm", "categorie": "Maçonnerie", "unite": "ml", "occurrences": 1, "prixMin": 408.34, "prixMoy": 408.34, "prixMax": 408.34}, {"id": "a1f8jgnk", "designation": "Portail coulissant refoulement droite L4200xH1200mm, lames 200mm et 100mm diagonales, DEA Kit 624", "categorie": "Portails et portillon", "unite": "ENS", "occurrences": 1, "prixMin": 4880.34, "prixMoy": 4880.34, "prixMax": 4880.34}, {"id": "k6wd7hqj", "designation": "Portillon battant L990xH1200mm, RAL 7016 FT, serrure inox, poignée inox", "categorie": "Portails et portillon", "unite": "ENS", "occurrences": 1, "prixMin": 1591.55, "prixMoy": 1591.55, "prixMax": 1591.55}, {"id": "jjgceszs", "designation": "Portail coulissant refoulement gauche L2640xH1200mm, rail alu, galets inox, serrure inox", "categorie": "Portails et portillon", "unite": "ENS", "occurrences": 1, "prixMin": 3463.83, "prixMoy": 3463.83, "prixMax": 3463.83}, {"id": "f5xgkje2", "designation": "Bordures pierre naturelle sur fondation béton, joints teintés", "categorie": "Bordures", "unite": "ml", "occurrences": 1, "prixMin": 67.71, "prixMoy": 67.71, "prixMax": 67.71}, {"id": "u0jrhnh5", "designation": "Broyage haie laurier, arrachage et évacuation souches déchetterie", "categorie": "Démolition / Débroussaillage", "unite": "ENS", "occurrences": 1, "prixMin": 673.2, "prixMoy": 673.2, "prixMax": 673.2}, {"id": "gq2y5jex", "designation": "Clôture béton 4 plaques 50cm, poteaux béton H280cm, finition droite", "categorie": "Clôture", "unite": "ml", "occurrences": 1, "prixMin": 120.31, "prixMoy": 120.31, "prixMax": 120.31}, {"id": "965e2x9m", "designation": "Marches palières travertin 1.20x1.20m ep.6cm, collées sur massifs béton", "categorie": "Maçonnerie / Pierre", "unite": "u", "occurrences": 1, "prixMin": 649.89, "prixMoy": 649.89, "prixMax": 649.89}, {"id": "f6b86nre", "designation": "Retenue terre paillis ardoise faces clivées", "categorie": "Maçonnerie paysagère", "unite": "ml", "occurrences": 1, "prixMin": 149.56, "prixMoy": 149.56, "prixMax": 149.56}, {"id": "yl5eltl4", "designation": "Démolition muret pierre, chargement et évacuation décharge", "categorie": "Démolition", "unite": "ml", "occurrences": 1, "prixMin": 35.57, "prixMoy": 35.57, "prixMax": 35.57}, {"id": "rftbko3b", "designation": "Piliers maçonnés préfabriqués 39x39 gris/beige H2200mm, ferraillés et bétonnés", "categorie": "Maçonnerie", "unite": "u", "occurrences": 1, "prixMin": 363.88, "prixMoy": 363.88, "prixMax": 363.88}, {"id": "24al67ua", "designation": "Muret parpaings H1.20m - fouilles, semelles filantes, enduit gratté monocouche", "categorie": "Maçonnerie", "unite": "ml", "occurrences": 1, "prixMin": 413.81, "prixMoy": 413.81, "prixMax": 413.81}, {"id": "728g02bm", "designation": "Drainage mur - delta MS + drain DN100 géotextile + grave drainante 20/40", "categorie": "Drainage", "unite": "ml", "occurrences": 1, "prixMin": 24.84, "prixMoy": 24.84, "prixMax": 24.84}, {"id": "t0e2c0p7", "designation": "Fondation et seuil portail battant et portillon - béton BPS XC1 C20/25 ep.25cm", "categorie": "Fondation", "unite": "ENS", "occurrences": 1, "prixMin": 815.76, "prixMoy": 815.76, "prixMax": 815.76}, {"id": "r1r6z1z3", "designation": "Portail battant 2 vantaux L4000xH2000mm, aluminium, DEA Geko Pro 24V, RAL 7016 FT", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 5898.5, "prixMoy": 5898.5, "prixMax": 5898.5}, {"id": "wdm63db2", "designation": "Visiophone Gates Digitalia code tactile, caméra 15°, moniteur 7 pouces WiFi IP55", "categorie": "Contrôle accès", "unite": "ENS", "occurrences": 1, "prixMin": 894.7, "prixMoy": 894.7, "prixMax": 894.7}, {"id": "czmi2f99", "designation": "Portillon battant L1000xH2000mm, remplissage idem portail, gâche électrique", "categorie": "Portillon", "unite": "ENS", "occurrences": 1, "prixMin": 1769.01, "prixMoy": 1769.01, "prixMax": 1769.01}, {"id": "n35bzoj5", "designation": "Caniveau grille DN200 classe C250 sur fondation béton avec raccordement collecteur", "categorie": "Assainissement", "unite": "ml", "occurrences": 1, "prixMin": 144.61, "prixMoy": 144.61, "prixMax": 144.61}, {"id": "bsztmohl", "designation": "Béton désactivé avec membrane désolidarisation et désactivant biodégradable", "categorie": "Revêtements", "unite": "m2", "occurrences": 1, "prixMin": 75.98, "prixMoy": 75.98, "prixMax": 75.98}, {"id": "mhppdrmn", "designation": "Bordure Galva Flex H10cm pour délimitation de massif", "categorie": "Bordures", "unite": "ml", "occurrences": 1, "prixMin": 26.91, "prixMoy": 26.91, "prixMax": 26.91}, {"id": "vrggbq0u", "designation": "Raccordement eaux pluviales - canalisation DN125", "categorie": "Assainissement", "unite": "ml", "occurrences": 1, "prixMin": 60.34, "prixMoy": 60.34, "prixMax": 60.34}, {"id": "clugpc1m", "designation": "Engazonnement - scarification, épierrage et engazonnement", "categorie": "Espaces verts", "unite": "m2", "occurrences": 1, "prixMin": 17.19, "prixMoy": 17.19, "prixMax": 17.19}, {"id": "429dfdt6", "designation": "Dallage BETOGREEN C 50x50x10 sur fondation sablée, remplissage gravier gris", "categorie": "Revêtements", "unite": "m2", "occurrences": 1, "prixMin": 83.27, "prixMoy": 83.27, "prixMax": 83.27}, {"id": "44n13fh9", "designation": "Toile paillage sur massifs, ancrée par cavaliers galvanisés", "categorie": "Aménagements paysagers", "unite": "m2", "occurrences": 1, "prixMin": 11.63, "prixMoy": 11.63, "prixMax": 11.63}, {"id": "76jl7wj0", "designation": "Plantations végétaux sur massifs paysagers", "categorie": "Aménagements paysagers", "unite": "ENS", "occurrences": 1, "prixMin": 766.26, "prixMoy": 766.26, "prixMax": 766.26}, {"id": "99ilprtz", "designation": "Portail coulissant aluminium RAL 7016, passage 3m50, H1500mm, lames 200mm, DEA kit 624", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 5705.76, "prixMoy": 5705.76, "prixMax": 5705.76}, {"id": "3ek6ue4h", "designation": "Portail coulissant aluminium RAL 7016, passage 4m90, H1500mm, lames 200mm, DEA kit 624", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 6255.27, "prixMoy": 6255.27, "prixMax": 6255.27}, {"id": "fsvipoo0", "designation": "Chape mince - primaire accroche, dosée 300kg ciment, fibres synthétiques", "categorie": "Chape", "unite": "m2", "occurrences": 1, "prixMin": 37.98, "prixMoy": 37.98, "prixMax": 37.98}, {"id": "hwrsnsah", "designation": "Résine granulats marbre - profilés rives inox, primaire, résine polyuréthane, badigeon", "categorie": "Revêtement résine", "unite": "m2", "occurrences": 1, "prixMin": 93.17, "prixMoy": 93.17, "prixMax": 93.17}, {"id": "cqcbodpp", "designation": "Caniveau pierre naturelle 4 rangs sur béton, joint mortier teinté", "categorie": "Drainage", "unite": "ml", "occurrences": 1, "prixMin": 137.42, "prixMoy": 137.42, "prixMax": 137.42}, {"id": "el4y0yck", "designation": "Jardinière palis ardoise ARDESIA H50cm, 3mx1m, terre amendée", "categorie": "Maçonnerie", "unite": "ENS", "occurrences": 1, "prixMin": 1392.8, "prixMoy": 1392.8, "prixMax": 1392.8}, {"id": "oe7h0xv1", "designation": "Pas japonais dalles ardoise clivée sur assise sablée", "categorie": "Revêtement", "unite": "u", "occurrences": 1, "prixMin": 55.0, "prixMoy": 55.0, "prixMax": 55.0}, {"id": "nnf2x4lg", "designation": "Terrasse bois exotique cumaru, lambourdage 60x40, lames 145x21mm", "categorie": "Terrasse bois", "unite": "m2", "occurrences": 1, "prixMin": 180.04, "prixMoy": 180.04, "prixMax": 180.04}, {"id": "6pd5ugij", "designation": "Terrassements déblais avec chargement, évacuation décharge agréée", "categorie": "Terrassement", "unite": "m2", "occurrences": 1, "prixMin": 15.3, "prixMoy": 15.3, "prixMax": 15.3}, {"id": "5byqzyqi", "designation": "Démolition seuil béton, chargement et évacuation gravats", "categorie": "Maçonnerie", "unite": "ENS", "occurrences": 1, "prixMin": 424.95, "prixMoy": 424.95, "prixMax": 424.95}, {"id": "gq8ixilr", "designation": "Regard grille 30x30 classe C250 avec raccordement gouttières", "categorie": "Réseaux", "unite": "u", "occurrences": 1, "prixMin": 250.55, "prixMoy": 250.55, "prixMax": 250.55}, {"id": "qvd3zglz", "designation": "Dalles alvéolées gravillonnées Eccogravel 30D, gravier palvadeau 8/12", "categorie": "Revêtements", "unite": "m2", "occurrences": 1, "prixMin": 30.52, "prixMoy": 30.52, "prixMax": 30.52}, {"id": "izb58hjf", "designation": "Terrasse pin classe 4 - lambourdage 65x50, lames 145x27mm vissées, DTU 51-4", "categorie": "Terrasse bois", "unite": "m2", "occurrences": 1, "prixMin": 134.22, "prixMoy": 134.22, "prixMax": 134.22}, {"id": "v0cf57jb", "designation": "Retenue terre traverses paysagères pin traité autoclave 100x200 H=80cm", "categorie": "Bordures", "unite": "ml", "occurrences": 1, "prixMin": 191.27, "prixMoy": 191.27, "prixMax": 191.27}, {"id": "s5enythl", "designation": "Dalles alvéolées gravillonnées Eccogravel 40D, gravier palvadeau 8/12", "categorie": "Revêtements", "unite": "m2", "occurrences": 1, "prixMin": 35.08, "prixMoy": 35.08, "prixMax": 35.08}, {"id": "sti1kw1i", "designation": "Boîte lettres encastrée dans clôture, kit encastrement DECAYEUX", "categorie": "Accessoire clôture", "unite": "ENS", "occurrences": 1, "prixMin": 290.4, "prixMoy": 290.4, "prixMax": 290.4}, {"id": "dhw7rcfp", "designation": "Portillon battant aluminium RAL 7016 FT 1200x1900mm, lames horizontales, gâche électrique", "categorie": "Portillon", "unite": "ENS", "occurrences": 1, "prixMin": 2497.8, "prixMoy": 2497.8, "prixMax": 2497.8}, {"id": "vy4jqzjr", "designation": "Arrachage de souches", "categorie": "Démolition", "unite": "u", "occurrences": 1, "prixMin": 50.0, "prixMoy": 50.0, "prixMax": 50.0}, {"id": "vb7zmmx1", "designation": "Portail coulissant refoulement droite L4500xH1800mm, RAL 7016 FT, lames 200mm, kit batterie", "categorie": "Portail", "unite": "ENS", "occurrences": 1, "prixMin": 6274.88, "prixMoy": 6274.88, "prixMax": 6274.88}, {"id": "3zxvtde1", "designation": "Retenue terre paillis ardoise faces clivées, hauteur hors sol variable", "categorie": "Maçonnerie paysagère", "unite": "ml", "occurrences": 1, "prixMin": 93.51, "prixMoy": 93.51, "prixMax": 93.51}, {"id": "2ma2w3un", "designation": "Clôture pin cl.4 Panneaux Cambridge 180x180 anthracite, poteaux alu RAL 7016 H2.80m", "categorie": "Clôture", "unite": "ml", "occurrences": 1, "prixMin": 160.68, "prixMoy": 160.68, "prixMax": 160.68}, {"id": "s1fmyhb8", "designation": "Dallage travertin ep.12mm, pose mortier colle OPUS romain 4 formats, joint mortier teinté", "categorie": "Dallage", "unite": "m2", "occurrences": 1, "prixMin": 140.9, "prixMoy": 140.9, "prixMax": 140.9}, {"id": "sc7bielp", "designation": "Caniveau grille DN100 classe C250 sur fondation béton avec raccordement collecteur", "categorie": "Assainissement", "unite": "ml", "occurrences": 1, "prixMin": 125.4, "prixMoy": 125.4, "prixMax": 125.4}, {"id": "0rwe2c9z", "designation": "Nettoyage terrasse au RESINEO Entretien", "categorie": "Nettoyage", "unite": "m2", "occurrences": 1, "prixMin": 3.91, "prixMoy": 3.91, "prixMax": 3.91}, {"id": "ot3wiz1s", "designation": "Résine granulats marbre sur murette - profilés inox, primaire, résine polyuréthane, finition lissée", "categorie": "Résine", "unite": "m2", "occurrences": 1, "prixMin": 215.06, "prixMoy": 215.06, "prixMax": 215.06}, {"id": "uzw5tvav", "designation": "Résine granulats marbre sur escalier - profilés inox, primaire, résine polyuréthane, badigeon", "categorie": "Résine", "unite": "m2", "occurrences": 1, "prixMin": 360.74, "prixMoy": 360.74, "prixMax": 360.74}, {"id": "tmuodi3t", "designation": "Dallage pierre naturelle - pavage 15x15 et 15x30, chape fibrée, joint mortier teinté", "categorie": "Dallage pierre naturelle", "unite": "m2", "occurrences": 1, "prixMin": 397.66, "prixMoy": 397.66, "prixMax": 397.66}];
 
-// ── ETAT ────────────────────────────────────────
-let currentStep = 1;
-let lignes = [];
-let sigData = null;
-let devisList = JSON.parse(localStorage.getItem('la_devis')||'[]');
-let currentDevis = null;
-
-// ── LOGIN ────────────────────────────────────────
-function doLogin() {
-  const v = document.getElementById('pwd').value;
-  if(v === PWD) {
-    sessionStorage.setItem('la_auth','1');
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').classList.remove('hidden');
-    initApp();
-  } else {
-    document.getElementById('login-err').style.display='block';
-  }
-}
-document.getElementById('pwd').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
-if(sessionStorage.getItem('la_auth')==='1') {
-  document.getElementById('login').style.display='none';
-  document.getElementById('app').classList.remove('hidden');
-  initApp();
-}
-function saveApiKey() {
-  const key = document.getElementById('api-key-input').value.trim();
-  if(!key) { showToast('Entrez une cle API'); return; }
-  localStorage.setItem('la_apikey', key);
-  showToast('Cle API enregistree');
-}
-
-function saveEmailJS() {
-  const svc = document.getElementById('ejs-service').value.trim();
-  const tpl = document.getElementById('ejs-template').value.trim();
-  const key = document.getElementById('ejs-pubkey').value.trim();
-  if(!svc || !tpl || !key) { showToast('Remplissez tous les champs EmailJS'); return; }
-  localStorage.setItem('ejs_service',  svc);
-  localStorage.setItem('ejs_template', tpl);
-  localStorage.setItem('ejs_pubkey',   key);
-  showToast('EmailJS configure');
-}
-
-
-function logout() {
-  sessionStorage.removeItem('la_auth');
-  location.reload();
-}
-
-// ── INIT ────────────────────────────────────────
-function initApp() {
-  // Dates par defaut
-  const today = new Date().toISOString().split('T')[0];
-  const in15  = new Date(Date.now()+15*86400000).toISOString().split('T')[0];
-  document.getElementById('devis-date').value = today;
-  document.getElementById('devis-valid').value = in15;
-  // Catalogue
-  buildCatFilters();
-  renderCatList('');
-  buildFullCatFilters();
-  renderFullCatListFiltered('','');
-  // Devis
-  renderDevisList();
-  // Parametres
-  document.getElementById('api-key-input').value = localStorage.getItem('la_apikey')||'';
-  document.getElementById('ejs-service').value  = localStorage.getItem('ejs_service')||'';
-  document.getElementById('ejs-template').value = localStorage.getItem('ejs_template')||'';
-  document.getElementById('ejs-pubkey').value   = localStorage.getItem('ejs_pubkey')||'';
-  // Signature canvas
-  showScreen('accueil');
-}
-
-// SAUVEGARDE & ENVOI
-function sauvegarderDevis() {
-  if(!currentDevis) { showToast('Completez le devis avant de sauvegarder'); return; }
-  captureSig();
-  currentDevis.sigClient = sigData;
-  currentDevis.savedAt = new Date().toISOString();
-  devisList = devisList.filter(d=>d.num !== currentDevis.num);
-  devisList.unshift(currentDevis);
-  localStorage.setItem('la_devis', JSON.stringify(devisList));
-  renderDevisList();
-  showToast('Devis sauvegarde');
-}
-
-function renderDevisList() {
-  const el = document.getElementById('devis-list');
-  if(!el) return;
-  if(!devisList.length) {
-    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">📋</div><div>Aucun devis</div><div style="font-size:12px;margin-top:6px;">Cliquez + Devis pour commencer</div></div>';
-    return;
-  }
-  el.innerHTML = devisList.map(d=>`
-    <div class="card" style="cursor:pointer;" onclick="ouvrirDevis('${d.num}')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div>
-          <div style="font-size:14px;font-weight:600;">${escHtml(d.cli?.nom||'-')}</div>
-          <div style="font-size:11px;color:var(--text3);">${d.num} · ${fmtDate(d.date1)}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:18px;font-weight:700;color:var(--vert)">${fmt(d.t?.ttc||0)} E</div>
-          <div style="font-size:11px;color:var(--text3);">TTC</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-async function envoyerDevis() {
-  captureSig();
-  if(currentDevis) { currentDevis.sigClient = sigData; }
-  const email = document.getElementById('send-email').value.trim();
-  const msg   = document.getElementById('send-msg').value || 'Veuillez trouver ci-joint votre devis.';
-  const statusEl = document.getElementById('send-status');
-  if(!email) { showToast('Entrez un email client'); return; }
-  if(!gAccessToken) {
-    statusEl.innerHTML = '<span style="color:#e53935;">Connectez-vous d abord via le bouton Agenda Google a l etape 1.</span>';
-    return;
-  }
-  statusEl.textContent = 'Generation du PDF...';
-  // Build PDF as base64 via print content
-  buildPrintArea();
-  const printHtml = document.getElementById('print-area').innerHTML;
-  // Generate PDF using browser blob + Gmail API
-  statusEl.textContent = 'Envoi en cours...';
-  try {
-    // Build email with embedded HTML (Gmail API)
-    const subject = 'Devis Loire Amenagement - ' + (currentDevis?.num||'');
-    // Build full devis HTML for email
-    const lignesHtml = (currentDevis?.lignes||[]).map(l=>{
-      if(l.type==='chapter')    return `<tr><td colspan="5" style="background:#f2f8f3;border-left:4px solid #2d6e3e;padding:8px 12px;font-weight:700;font-size:13px;">${escHtml(l.label)}</td></tr>`;
-      if(l.type==='subchapter') return `<tr><td colspan="5" style="background:#f7faf3;border-left:3px solid #4a9c5a;padding:6px 12px 6px 20px;font-weight:600;font-size:12px;color:#2d6e3e;">${escHtml(l.label)}</td></tr>`;
-      return `<tr style="border-bottom:1px solid #eee;">
-        <td style="padding:8px 10px;font-size:12px;">${escHtml(l.label)}</td>
-        <td style="padding:8px;text-align:center;font-size:11px;color:#888;">${l.unite||''}</td>
-        <td style="padding:8px;text-align:right;font-size:12px;">${l.qte}</td>
-        <td style="padding:8px;text-align:right;font-size:12px;">${fmt(l.prix||0)} €</td>
-        <td style="padding:8px;text-align:right;font-size:12px;font-weight:600;">${fmt(l.qte*(l.prix||0))} €</td>
-      </tr>`;
-    }).join('');
-
-    const sigHtml = currentDevis?.sigClient
-      ? `<img src="${currentDevis.sigClient}" style="max-height:80px;max-width:200px;">`
-      : '';
-
-    const htmlBody = `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#333;margin:0;padding:0;">
-      <div style="max-width:700px;margin:0 auto;padding:20px;">
-
-        <!-- BANDEAU -->
-        <div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a);padding:20px 24px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.15em;">DEVIS ESTIMATIF</div>
-            <div style="color:white;font-size:20px;font-weight:700;">${currentDevis?.num||''}</div>
-          </div>
-          <div style="text-align:right;color:white;font-size:12px;">
-            <div>Emis le ${fmtDate(currentDevis?.date1||'')}</div>
-            <div style="color:#ffd0d0;">Valable ${fmtDate(currentDevis?.date2||'')}</div>
-          </div>
-        </div>
-
-        <!-- EN-TETE CLIENT -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;background:#f9fafb;border:1px solid #eee;border-top:none;">
-          <div>
-            <div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">EMETTEUR</div>
-            <div style="font-weight:700;">${SOC.nom}</div>
-            <div style="font-size:12px;color:#555;">${SOC.adresse}</div>
-            <div style="font-size:12px;color:#555;">${SOC.tel}</div>
-            <div style="font-size:12px;color:#3a8fbf;">${SOC.email}</div>
-            <div style="font-size:10px;color:#aaa;margin-top:4px;">SIRET ${SOC.siret}</div>
-          </div>
-          <div>
-            <div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">CLIENT</div>
-            <div style="font-weight:700;">${escHtml(currentDevis?.cli?.nom||'-')}</div>
-            <div style="font-size:12px;color:#555;">${escHtml(currentDevis?.cli?.adresse||'')} ${currentDevis?.cli?.cp||''} ${escHtml(currentDevis?.cli?.ville||'')}</div>
-            <div style="font-size:12px;color:#555;">${currentDevis?.cli?.tel||''}</div>
-            <div style="font-size:12px;color:#3a8fbf;">${currentDevis?.cli?.email||''}</div>
-          </div>
-        </div>
-
-        <!-- MESSAGE -->
-        <div style="padding:16px 20px;background:#fff;border:1px solid #eee;border-top:none;">
-          <p style="margin:0;color:#333;">Bonjour ${escHtml(currentDevis?.cli?.nom||'')},</p>
-          <p style="margin:8px 0 0;color:#555;">${escHtml(msg)}</p>
-        </div>
-
-        <!-- TABLEAU PRESTATIONS -->
-        <table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-top:none;">
-          <thead>
-            <tr style="background:#2d6e3e;color:white;">
-              <th style="padding:10px;text-align:left;font-size:11px;">DESIGNATION</th>
-              <th style="padding:10px;text-align:center;font-size:11px;">UNITE</th>
-              <th style="padding:10px;text-align:right;font-size:11px;">QTE</th>
-              <th style="padding:10px;text-align:right;font-size:11px;">P.U. HT</th>
-              <th style="padding:10px;text-align:right;font-size:11px;">TOTAL HT</th>
-            </tr>
-          </thead>
-          <tbody>${lignesHtml}</tbody>
-        </table>
-
-        <!-- TOTAUX -->
-        <div style="padding:16px 20px;background:#f9fafb;border:1px solid #eee;border-top:none;display:flex;justify-content:flex-end;">
-          <div style="width:280px;">
-            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>Total HT</span><span>${fmt(currentDevis?.t?.ht||0)} €</span></div>
-            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>TVA ${currentDevis?.tvaRate||10}%</span><span>${fmt(currentDevis?.t?.tva||0)} €</span></div>
-            <div style="display:flex;justify-content:space-between;background:#2d6e3e;color:white;padding:12px;border-radius:6px;margin-top:6px;"><span>TOTAL TTC</span><span style="font-size:18px;font-weight:700;">${fmt(currentDevis?.t?.ttc||0)} €</span></div>
-            ${currentDevis?.acompteRate>0?`<div style="display:flex;justify-content:space-between;padding:8px;background:#f0f8f0;border-radius:6px;margin-top:6px;font-size:13px;border-left:3px solid #2d6e3e;"><span>Acompte ${currentDevis.acompteRate}%</span><span style="font-weight:700;color:#2d6e3e;">${fmt((currentDevis?.t?.ttc||0)*currentDevis.acompteRate/100)} €</span></div>`:''}
-          </div>
-        </div>
-
-        <!-- RIB -->
-        <div style="padding:14px 20px;background:#f5f0e8;border:1px solid #eee;border-top:none;font-size:12px;color:#666;line-height:1.8;">
-          <div style="font-weight:600;color:#8a7a5a;letter-spacing:.1em;font-size:10px;margin-bottom:6px;">REGLEMENT</div>
-          <div>IBAN: ${SOC.iban} · BIC: ${SOC.bic}</div>
-          <div>Acompte à la commande: <strong style="color:#2d6e3e;">${fmt((currentDevis?.t?.ttc||0)*((currentDevis?.acompteRate||30)/100))} € TTC</strong></div>
-        </div>
-
-        <!-- SIGNATURE CLIENT -->
-        ${sigHtml?`<div style="padding:14px 20px;background:#fff;border:1px solid #eee;border-top:none;">
-          <div style="font-size:10px;color:#888;letter-spacing:.1em;margin-bottom:8px;">SIGNATURE CLIENT</div>
-          ${sigHtml}
-        </div>`:''}
-
-        <!-- PIED -->
-        <div style="padding:14px 20px;background:#eee;border-radius:0 0 8px 8px;font-size:11px;color:#666;border:1px solid #ddd;border-top:none;">
-          <strong>${SOC.nom}</strong> · ${SOC.adresse} · ${SOC.tel} · ${SOC.email}
-        </div>
-
-      </div>
-    </body></html>`;
-
-    // Build RFC 2822 email with proper base64 HTML encoding
-    const boundary = 'LA_DEVIS_' + Date.now();
-    const htmlBase64 = btoa(unescape(encodeURIComponent(htmlBody)));
-    const rawEmail = [
-      'From: Loire Amenagement <' + (gUserEmail||'me') + '>',
-      'To: ' + email,
-      'Subject: =?UTF-8?B?' + btoa(unescape(encodeURIComponent(subject))) + '?=',
-      'MIME-Version: 1.0',
-      'Content-Type: text/html; charset=UTF-8',
-      'Content-Transfer-Encoding: base64',
-      '',
-      htmlBase64
-    ].join('\r\n');
-    const encodedEmail = btoa(unescape(encodeURIComponent(rawEmail)))
-      .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-
-    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + gAccessToken,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({raw: encodedEmail})
-    });
-
-    if(!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || 'Erreur Gmail ' + res.status);
-    }
-
-    statusEl.innerHTML = '<span style="color:#2d6e3e;font-weight:600;">Email envoye avec succes depuis votre Gmail !</span>';
-    sauvegarderDevis();
-  } catch(e) {
-    statusEl.innerHTML = '<span style="color:#e53935;">Erreur: ' + e.message + '</span>';
-  }
-}
-
-
-function imprimerDevis() {
-  captureSig();
-  if(currentDevis) { currentDevis.sigClient = sigData; }
-  buildPrintArea();
-  window.print();
-}
-
-function nouveauDevis() {
-  lignes = []; sigData = null; currentDevis = null;
-  activeChapId = null;
-  ['cli-nom','cli-adresse','cli-cp','cli-ville','cli-email','cli-tel','cli-desc','send-msg'].forEach(id=>{
-    const el = document.getElementById(id); if(el) el.value='';
-  });
-  document.getElementById('devis-acompte').value = '30';
-  document.getElementById('devis-tva').value = '10';
-  document.getElementById('send-status').textContent = '';
-  const today = new Date().toISOString().split('T')[0];
-  const in15  = new Date(Date.now()+15*86400000).toISOString().split('T')[0];
-  document.getElementById('devis-date').value  = today;
-  document.getElementById('devis-valid').value = in15;
-  if(sigCtx) clearSig();
-  renderLignes();
-  goStep(1);
-  showScreen('nouveau');
-}
-
-
-// SIGNATURE CANVAS
-function openSigOverlay() {
-  const overlay = document.getElementById('sig-overlay');
-  overlay.style.display = 'flex';
-  overlay.style.pointerEvents = 'all';
-  document.body.style.overflow = 'hidden';
-  // Init canvas after display
-  setTimeout(()=>{
-    const canvas = document.getElementById('sig-canvas');
-    const container = canvas.parentElement;
-    canvas.width  = container.clientWidth;
-    canvas.height = container.clientHeight;
-    sigCtx = canvas.getContext('2d');
-    sigCtx.strokeStyle = '#1a2e1a';
-    sigCtx.lineWidth   = 2.5;
-    sigCtx.lineCap     = 'round';
-    sigCtx.lineJoin    = 'round';
-    sigCtx.clearRect(0, 0, canvas.width, canvas.height);
-    sigData = null;
-    attachSigEvents(canvas);
-  }, 100);
-}
-
-function closeSigOverlay(save) {
-  if(save) {
-    captureSig();
-    // Show preview
-    const prev = document.getElementById('sig-preview');
-    const img  = document.getElementById('sig-preview-img');
-    if(prev && img && sigData) {
-      img.src = sigData;
-      prev.style.display = 'block';
-    }
-    showToast('Signature enregistree');
-  }
-  const ov = document.getElementById('sig-overlay');
-  ov.style.display = 'none';
-  ov.style.pointerEvents = 'none';
-  document.body.style.overflow = '';
-}
-
-function attachSigEvents(canvas) {
-  // Remove old listeners by cloning
-  const newCanvas = canvas.cloneNode(true);
-  canvas.parentNode.replaceChild(newCanvas, canvas);
-  sigCtx = newCanvas.getContext('2d');
-  sigCtx.strokeStyle = '#1a2e1a';
-  sigCtx.lineWidth   = 2.5;
-  sigCtx.lineCap     = 'round';
-  sigCtx.lineJoin    = 'round';
-
-  let drawing = false, lastX = 0, lastY = 0;
-
-  function pos(e) {
-    const r = newCanvas.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return [(t.clientX - r.left) * (newCanvas.width / r.width),
-            (t.clientY - r.top)  * (newCanvas.height / r.height)];
-  }
-  newCanvas.addEventListener('mousedown',  e=>{ drawing=true;  [lastX,lastY]=pos(e); });
-  newCanvas.addEventListener('mousemove',  e=>{ if(!drawing) return; const [x,y]=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(x,y); sigCtx.stroke(); [lastX,lastY]=[x,y]; });
-  newCanvas.addEventListener('mouseup',    ()=>drawing=false);
-  newCanvas.addEventListener('touchstart', e=>{ e.preventDefault(); e.stopPropagation(); drawing=true;  [lastX,lastY]=pos(e); }, {passive:false});
-  newCanvas.addEventListener('touchmove',  e=>{ e.preventDefault(); e.stopPropagation(); if(!drawing) return; const [x,y]=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(x,y); sigCtx.stroke(); [lastX,lastY]=[x,y]; }, {passive:false});
-  newCanvas.addEventListener('touchend',   e=>{ e.preventDefault(); drawing=false; }, {passive:false});
-}
-
-
-let sigCtx = null, sigDrawing = false, sigLastX = 0, sigLastY = 0;
-
-function resizeSigCanvas() {
-  const canvas = document.getElementById('sig-canvas');
-  if(!canvas) return;
-  const w = canvas.parentElement ? canvas.parentElement.clientWidth - 32 : 320;
-  if(w > 0) {
-    canvas.width = w;
-    canvas.height = 200;
-    if(sigCtx) {
-      sigCtx.strokeStyle = '#1a2e1a';
-      sigCtx.lineWidth = 2.5;
-      sigCtx.lineCap = 'round';
-      sigCtx.lineJoin = 'round';
-    }
-  }
-}
-
-function initSigCanvas() {
-  const canvas = document.getElementById('sig-canvas');
-  if(!canvas) return;
-  sigCtx = canvas.getContext('2d');
-  sigCtx.strokeStyle = '#1a2e1a';
-  sigCtx.lineWidth = 2.5;
-  sigCtx.lineCap = 'round';
-  sigCtx.lineJoin = 'round';
-
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const src = e.touches ? e.touches[0] : e;
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return [(src.clientX - rect.left) * scaleX, (src.clientY - rect.top) * scaleY];
-  }
-  canvas.addEventListener('mousedown', e => { sigDrawing=true; [sigLastX,sigLastY]=getPos(e); });
-  canvas.addEventListener('mousemove', e => {
-    if(!sigDrawing) return;
-    const [x,y] = getPos(e);
-    sigCtx.beginPath(); sigCtx.moveTo(sigLastX,sigLastY); sigCtx.lineTo(x,y); sigCtx.stroke();
-    [sigLastX,sigLastY] = [x,y];
-  });
-  canvas.addEventListener('mouseup', () => sigDrawing=false);
-  canvas.addEventListener('touchstart', e => { e.preventDefault(); sigDrawing=true; [sigLastX,sigLastY]=getPos(e); }, {passive:false});
-  canvas.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if(!sigDrawing) return;
-    const [x,y] = getPos(e);
-    sigCtx.beginPath(); sigCtx.moveTo(sigLastX,sigLastY); sigCtx.lineTo(x,y); sigCtx.stroke();
-    [sigLastX,sigLastY] = [x,y];
-  }, {passive:false});
-  canvas.addEventListener('touchend', () => sigDrawing=false);
-}
-
-function clearSig() {
-  const canvas = document.getElementById('sig-canvas');
-  if(canvas && sigCtx) sigCtx.clearRect(0, 0, canvas.width, canvas.height);
-  sigData = null;
-}
-
-function captureSig() {
-  const canvas = document.getElementById('sig-canvas');
-  if(canvas) sigData = canvas.toDataURL('image/png');
-}
-
-// ── SCREENS ────────────────────────────────────
-function showScreen(name) {
-  ['accueil','nouveau','catalogue','parametres'].forEach(s=>{
-    document.getElementById('s-'+s).classList.add('hidden');
-    document.getElementById('tab-'+s).classList.remove('active');
-  });
-  document.getElementById('s-'+name).classList.remove('hidden');
-  document.getElementById('tab-'+name).classList.add('active');
-  if(name==='nouveau') renderCatList('cat-list','');
-}
-
-// ── STEPS ──────────────────────────────────────
-function goStep(n) {
-  if(n===2) { setTimeout(()=>{ buildChapLibrary(); buildCatFilters(); renderCatList(''); updateActiveChapBadge(); },50); }
-  if(n===3) buildApercu();
-  // Show/hide steps and screen title for clean apercu
-  const stepsEl = document.getElementById('steps');
-  const titleEl = document.querySelector('#s-nouveau .screen-title');
-  if(stepsEl) stepsEl.style.display = n===3 ? 'none' : 'flex';
-  if(titleEl) titleEl.style.display = n===3 ? 'none' : 'block';
-  if(n===4) {
-    setTimeout(()=>{
-      if(!sigCtx) initSigCanvas();
-      resizeSigCanvas();
-    }, 200);
-  }
-  if(n===5) {document.getElementById('send-email').value=document.getElementById('cli-email').value;}
-  for(let i=1;i<=5;i++) {
-    document.getElementById('step-content-'+i).classList.toggle('hidden',i!==n);
-    const el=document.getElementById('step-'+i);
-    el.className='step'+(i===n?' active':i<n?' done':'');
-  }
-  currentStep=n;
-  document.getElementById('s-nouveau').scrollTop=0;
-}
-
-// CHAPITRES & CATALOGUE
-
-const CHAP_LIB = [
-  "Acces et allee","Arrosage et drainage","Cloture et portail",
-  "Demolition et depose","Eclairage exterieur","Espaces verts et plantations",
-  "Fondations et maconnerie","Installation de chantier","Jardin et paysagement",
-  "Revetement et dallage","Terrasse","Terrassement","Travaux preparatoires",
-  "Vegetalisation","Repli de chantier"
-];
 
 let activeChapId = null; // id du chapitre actif pour ajout prestation
 let ficheItem = null;    // prestation en cours de fiche
@@ -1669,11 +1202,152 @@ function fmt(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigit
 function fmtDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}catch(e){return d;}}
 function uid(){return Math.random().toString(36).slice(2,10).toUpperCase();}
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}const CATALOGUE = [
+{"id":"botele0","designation":"Boîte lettres encastrée dans clôture, kit encastrement DECAYEUX","categorie":"Clôtures","unite":"ENS","occurrences":1,"prixMin":290.4,"prixMoy":290.4,"prixMax":290.4},
+{"id":"plantati1","designation":"Plantations végétaux sur massifs paysagers","categorie":"Aménagements paysagers","unite":"ENS","occurrences":1,"prixMin":766.26,"prixMoy":766.26,"prixMax":766.26},
+{"id":"toilepa2","designation":"Toile paillage sur massifs, ancrée par cavaliers galvanisés","categorie":"Aménagements paysagers","unite":"m2","occurrences":1,"prixMin":11.63,"prixMoy":11.63,"prixMax":11.63},
+{"id":"grillee3","designation":"Grille eaux pluviales 300x300","categorie":"Assainissement","unite":"u","occurrences":1,"prixMin":84.7,"prixMoy":84.7,"prixMax":84.7},
+{"id":"regardd4","designation":"Regard de puisage PVC sous robinet extérieur","categorie":"Assainissement","unite":"forfait","occurrences":1,"prixMin":158.07,"prixMoy":158.07,"prixMax":158.07},
+{"id":"tranche5","designation":"Tranchées drainantes - drain DN90 géotextile, grave drainante 10/14","categorie":"Assainissement","unite":"ml","occurrences":1,"prixMin":43.99,"prixMoy":43.99,"prixMax":43.99},
+{"id":"caniveau6","designation":"Caniveau grille DN100 classe C250 sur fondation béton avec raccordement collecteur","categorie":"Assainissement","unite":"ml","occurrences":1,"prixMin":125.4,"prixMoy":125.4,"prixMax":125.4},
+{"id":"caniveau7","designation":"Caniveau grille DN200 classe C250 sur fondation béton avec raccordement collecteur","categorie":"Assainissement","unite":"ml","occurrences":1,"prixMin":144.61,"prixMoy":144.61,"prixMax":144.61},
+{"id":"raccorde8","designation":"Raccordement eaux pluviales - canalisation DN125","categorie":"Assainissement","unite":"ml","occurrences":1,"prixMin":60.34,"prixMoy":60.34,"prixMax":60.34},
+{"id":"regardg9","designation":"Regard grille 40x40 classe C250 - fourniture, pose, raccordement gouttières","categorie":"Assainissement","unite":"u","occurrences":1,"prixMin":322.16,"prixMoy":322.16,"prixMax":322.16},
+{"id":"visiopho10","designation":"Visiophone Gates mini Zen","categorie":"Portail et portillons","unite":"u","occurrences":1,"prixMin":915.4,"prixMoy":915.4,"prixMax":915.4},
+{"id":"bordure11","designation":"Bordure Galva Flex H10cm pour délimitation de massif","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":1,"prixMin":26.91,"prixMoy":26.91,"prixMax":26.91},
+{"id":"bordures12","designation":"Bordures pierre naturelle sur fondation béton, joints teintés","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":1,"prixMin":67.71,"prixMoy":67.71,"prixMax":67.71},
+{"id":"retenue13","designation":"Retenue terre traverses paysagères pin traité autoclave 100x200 H=80cm","categorie":"Maçonnerie paysagère","unite":"ml","occurrences":1,"prixMin":191.27,"prixMoy":191.27,"prixMax":191.27},
+{"id":"dallage14","designation":"Dallage pierre naturelle Travertin Opus 4 formats, joint mortier teinté","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":269.38,"prixMoy":269.38,"prixMax":269.38},
+{"id":"trappev15","designation":"Trappe visite pierre naturelle Travertin 50x50cm ep.3cm","categorie":"Autre, divers","unite":"ENS","occurrences":1,"prixMin":137.74,"prixMoy":137.74,"prixMax":137.74},
+{"id":"enrob016","designation":"Enrobé 0/6 noir 125kg/m2 (5cm)","categorie":"Revêtement","unite":"m2","occurrences":4,"prixMin":22.62,"prixMoy":28.7,"prixMax":31.16},
+{"id":"chapemi17","designation":"Chape mince - primaire accroche, dosée 300kg ciment, fibres synthétiques","categorie":"Maçonnerie","unite":"m2","occurrences":1,"prixMin":37.98,"prixMoy":37.98,"prixMax":37.98},
+{"id":"clture18","designation":"Clôture béton 4 plaques 50cm, poteaux béton H280cm, finition droite","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":120.31,"prixMoy":120.31,"prixMax":120.31},
+{"id":"clture19","designation":"Clôture pin cl.4 Panneaux Cambridge 180x180 anthracite, poteaux alu RAL 7016 H2.80m","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":160.68,"prixMoy":160.68,"prixMax":160.68},
+{"id":"clture20","designation":"Clôture aluminium thermolaqué RAL 7016 lames 200mm H808mm, poteaux platine vissée","categorie":"Clôtures","unite":"u","occurrences":1,"prixMin":5060.5,"prixMoy":5060.5,"prixMax":5060.5},
+{"id":"clture21","designation":"Clôture bois composite Traumgarten H180cm, poteaux alu rainuré, lames Classic, soubassement béton","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":260.08,"prixMoy":260.08,"prixMax":260.08},
+{"id":"clture22","designation":"Clôture lames aluminium gris 7016, soubassement béton, 12 lames 15cm, poteaux H2m60","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":401.12,"prixMoy":401.12,"prixMax":401.12},
+{"id":"clture23","designation":"Clôture panneaux rigides H1M48 plaque béton 25cm RAL 7016, poteaux alu scellés","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":148.1,"prixMoy":148.1,"prixMax":148.1},
+{"id":"clture24","designation":"Clôture panneaux rigides H1M78 plaque béton 25cm RAL 7016, poteaux alu scellés béton, grillage 5mm","categorie":"Clôtures","unite":"ml","occurrences":5,"prixMin":81.55,"prixMoy":89.81,"prixMax":101.73},
+{"id":"clture25","designation":"Clôture panneaux rigides H1M98 plaque béton 50cm RAL 7016, poteaux alu scellés","categorie":"Clôtures","unite":"ml","occurrences":1,"prixMin":108.24,"prixMoy":108.24,"prixMax":108.24},
+{"id":"couverti26","designation":"Couvertines aluminium laqué RAL 7016 sablé, pliées sur place, pose clipsée","categorie":"Clôtures","unite":"u","occurrences":1,"prixMin":845.25,"prixMoy":845.25,"prixMax":845.25},
+{"id":"installa27","designation":"Installation digicode SEWOSKY 1000 filaire","categorie":"Portail et portillons","unite":"forfait","occurrences":3,"prixMin":178.73,"prixMoy":183.78,"prixMax":186.3},
+{"id":"portail28","designation":"Portail battant 2 vantaux L4000xH1400mm, motorisation DEA Geko Pro 24V, photocellules","categorie":"Portail et portillons","unite":"forfait","occurrences":1,"prixMin":6103.62,"prixMoy":6103.62,"prixMax":6103.62},
+{"id":"portail29","designation":"Portail coulissant motorisé 5m H1800mm alu laqué RAL 7016, lames 200mm, DEA Kit 624, kit batterie","categorie":"Portail et portillons","unite":"u","occurrences":1,"prixMin":5687.92,"prixMoy":5687.92,"prixMax":5687.92},
+{"id":"portillo30","designation":"Portillon acier grillagé largeur 1m H1m53, occultable lames","categorie":"Portail et portillons","unite":"u","occurrences":1,"prixMin":594.91,"prixMoy":594.91,"prixMax":594.91},
+{"id":"portillo31","designation":"Portillon battant L1000xH1400mm, serrure inox, poignée inox","categorie":"Portail et portillons","unite":"forfait","occurrences":1,"prixMin":2022.26,"prixMoy":2022.26,"prixMax":2022.26},
+{"id":"portillo32","designation":"Portillon battant L975xH1990mm, serrure inox, poignée inox","categorie":"Portail et portillons","unite":"forfait","occurrences":1,"prixMin":1910.56,"prixMoy":1910.56,"prixMax":1910.56},
+{"id":"dgageme33","designation":"Dégagement emprises avant intervention clôture","categorie":"Travaux préparatoires","unite":"ENS","occurrences":1,"prixMin":414.0,"prixMoy":414.0,"prixMax":414.0},
+{"id":"visiopho34","designation":"Visiophone Gates Digitalia code tactile, caméra 15°, moniteur 7 pouces WiFi IP55","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":894.7,"prixMoy":894.7,"prixMax":894.7},
+{"id":"dallage35","designation":"Dallage travertin ep.12mm, pose mortier colle OPUS romain 4 formats, joint mortier teinté","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":140.9,"prixMoy":140.9,"prixMax":140.9},
+{"id":"dallage36","designation":"Dallage pierre naturelle - pavage 15x15 et 15x30, chape fibrée, joint mortier teinté","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":397.66,"prixMoy":397.66,"prixMax":397.66},
+{"id":"caniveau37","designation":"Caniveau pierre naturelle 4 rangs sur béton, joint mortier teinté","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":1,"prixMin":137.42,"prixMoy":137.42,"prixMax":137.42},
+{"id":"drainage38","designation":"Drainage mur - delta MS + drain DN100 géotextile + grave drainante 20/40","categorie":"Assainissement","unite":"ml","occurrences":1,"prixMin":24.84,"prixMoy":24.84,"prixMax":24.84},
+{"id":"arrachag39","designation":"Arrachage de souches","categorie":"Travaux préparatoires","unite":"u","occurrences":1,"prixMin":50.0,"prixMoy":50.0,"prixMax":50.0},
+{"id":"dmoliti40","designation":"Démolition dalle béton, chargement et évacuation gravats","categorie":"Démolitions","unite":"ENS","occurrences":2,"prixMin":37.71,"prixMoy":104.4,"prixMax":171.09},
+{"id":"dmoliti41","designation":"Démolition muret pierre, chargement et évacuation décharge","categorie":"Démolitions","unite":"ml","occurrences":1,"prixMin":35.57,"prixMoy":35.57,"prixMax":35.57},
+{"id":"broyage42","designation":"Broyage haie laurier, arrachage et évacuation souches déchetterie","categorie":"Travaux préparatoires","unite":"ENS","occurrences":1,"prixMin":673.2,"prixMoy":673.2,"prixMax":673.2},
+{"id":"rognage43","designation":"Rognage souche mécanisé","categorie":"Travaux préparatoires","unite":"u","occurrences":1,"prixMin":143.75,"prixMoy":143.75,"prixMax":143.75},
+{"id":"apportm44","designation":"Apport mise oeuvre terre végétale sur 15cm pour engazonnement","categorie":"Terrassement","unite":"m2","occurrences":2,"prixMin":18.24,"prixMoy":18.24,"prixMax":18.24},
+{"id":"engazonn45","designation":"Engazonnement - scarification, épierrage et engazonnement","categorie":"Aménagements paysagers","unite":"m2","occurrences":1,"prixMin":17.19,"prixMoy":17.19,"prixMax":17.19},
+{"id":"fondatio46","designation":"Fondation et seuil portail battant et portillon - béton BPS XC1 C20/25 ep.25cm","categorie":"Maçonnerie","unite":"ENS","occurrences":1,"prixMin":815.76,"prixMoy":815.76,"prixMax":815.76},
+{"id":"graveca47","designation":"Grave calcaire 0/10 stabilisée - sable calcaire naturel, compactage et nivellement","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":16.07,"prixMoy":16.07,"prixMax":16.07},
+{"id":"traverse48","designation":"Traverses paysagères chêne brut pour bordures","categorie":"Maçonnerie paysagère","unite":"ml","occurrences":1,"prixMin":43.05,"prixMoy":43.05,"prixMax":43.05},
+{"id":"remisee49","designation":"Remise en état jardin, repliement","categorie":"Travaux préparatoires","unite":"forfait","occurrences":1,"prixMin":230.0,"prixMoy":230.0,"prixMax":230.0},
+{"id":"dalleb50","designation":"Dalle béton ferraillé BPS XF1 C25/30 ep.12cm avec film poliane et coffrage","categorie":"Maçonnerie","unite":"m2","occurrences":2,"prixMin":47.69,"prixMoy":49.57,"prixMax":79.72},
+{"id":"dalleb51","designation":"Dalle béton ferraillé BPS XF1 C25/30 ep.12cm, film poliane, coffrage","categorie":"Autre, divers","unite":"m2","occurrences":1,"prixMin":79.72,"prixMoy":79.72,"prixMax":79.72},
+{"id":"dmoliti52","designation":"Démolition seuil béton, chargement et évacuation gravats","categorie":"Démolitions","unite":"ENS","occurrences":1,"prixMin":424.95,"prixMoy":424.95,"prixMax":424.95},
+{"id":"fournitu53","designation":"Fourniture pose couvertine aluminium pliée en continu sur place","categorie":"Clôtures","unite":"ml","occurrences":2,"prixMin":37.38,"prixMoy":37.38,"prixMax":37.38},
+{"id":"jardini54","designation":"Jardinière palis ardoise ARDESIA H50cm, 3mx1m, terre amendée","categorie":"Maçonnerie paysagère","unite":"ENS","occurrences":1,"prixMin":1392.8,"prixMoy":1392.8,"prixMax":1392.8},
+{"id":"massifs55","designation":"Massifs fondation - fouilles, béton BPS XC1 C25/30 ferraillé","categorie":"Maçonnerie","unite":"u","occurrences":2,"prixMin":87.5,"prixMoy":93.96,"prixMax":100.41},
+{"id":"muretpa56","designation":"Muret parpaings H1.20m - fouilles, semelles filantes, enduit gratté monocouche","categorie":"Maçonnerie","unite":"ml","occurrences":1,"prixMin":413.81,"prixMoy":413.81,"prixMax":413.81},
+{"id":"muretpa57","designation":"Muret parpaings creux 20cm, chainage, enduit monocouche 2 faces, H~60cm","categorie":"Autre, divers","unite":"ml","occurrences":1,"prixMin":408.34,"prixMoy":408.34,"prixMax":408.34},
+{"id":"piliers58","designation":"Piliers maçonnés préfabriqués 39x39 gris/beige H2200mm, ferraillés et bétonnés","categorie":"Maçonnerie","unite":"u","occurrences":1,"prixMin":363.88,"prixMoy":363.88,"prixMax":363.88},
+{"id":"semelle59","designation":"Semelle filante portail coulissant - coffrage, ferraillage, béton BPS XF1 ep.20cm, passage gaines","categorie":"Autre, divers","unite":"ENS","occurrences":3,"prixMin":819.63,"prixMoy":1271.51,"prixMax":1497.45},
+{"id":"marches60","designation":"Marches palières travertin 1.20x1.20m ep.6cm, collées sur massifs béton","categorie":"Maçonnerie paysagère","unite":"u","occurrences":1,"prixMin":649.89,"prixMoy":649.89,"prixMax":649.89},
+{"id":"bordures61","designation":"Bordures béton type P1 - fourniture pose bordure 8x20, fondation béton, joints mortier","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":2,"prixMin":44.51,"prixMoy":53.53,"prixMax":62.55},
+{"id":"chanett62","designation":"Chaînettes pavés pierre naturelle sur fondation béton, joints mortier teinté","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":4,"prixMin":42.28,"prixMoy":53.58,"prixMax":69.79},
+{"id":"piliers63","designation":"Piliers maçonnés H1500mm boisseaux 30x30x20","categorie":"Maçonnerie","unite":"u","occurrences":1,"prixMin":311.78,"prixMoy":311.78,"prixMax":311.78},
+{"id":"semelle64","designation":"Semelle filante portail coulissant - coffrage, ferraillage, béton BPS XF1 ep.25cm","categorie":"Maçonnerie","unite":"forfait","occurrences":1,"prixMin":1270.68,"prixMoy":1270.68,"prixMax":1270.68},
+{"id":"retenue65","designation":"Retenue terre paillis ardoise faces clivées","categorie":"Maçonnerie paysagère","unite":"ml","occurrences":1,"prixMin":93.51,"prixMoy":0,"prixMax":149.56},
+{"id":"retenue66","designation":"Retenue terre paillis ardoise faces clivées, hauteur hors sol variable","categorie":"Autre, divers","unite":"ml","occurrences":1,"prixMin":93.51,"prixMoy":93.51,"prixMax":93.51},
+{"id":"nettoyag67","designation":"Nettoyage terrasse au RESINEO Entretien","categorie":"Travaux préparatoires","unite":"m2","occurrences":1,"prixMin":3.91,"prixMoy":3.91,"prixMax":3.91},
+{"id":"installa68","designation":"Installation de chantier - amenées replis matériel, déchetterie","categorie":"Travaux préparatoires","unite":"ENS","occurrences":1,"prixMin":145.47,"prixMoy":145.47,"prixMax":145.47},
+{"id":"portail69","designation":"Portail battant 2 vantaux L4000xH2000mm, aluminium, DEA Geko Pro 24V, RAL 7016 FT","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":5898.5,"prixMoy":5898.5,"prixMax":5898.5},
+{"id":"portail70","designation":"Portail coulissant L3500xH1800mm, lames 200mm, DEA Kit 624 avec batterie","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":5093.0,"prixMoy":5093.0,"prixMax":5093.0},
+{"id":"portail71","designation":"Portail coulissant aluminium RAL 7016, passage 3m50, H1500mm, lames 200mm, DEA kit 624","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":5705.76,"prixMoy":5705.76,"prixMax":5705.76},
+{"id":"portail72","designation":"Portail coulissant aluminium RAL 7016, passage 4m90, H1500mm, lames 200mm, DEA kit 624","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":6255.27,"prixMoy":6255.27,"prixMax":6255.27},
+{"id":"portail73","designation":"Portail coulissant refoulement droite L4000xH1400mm, lames 195mm, rail alu, galets inox","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":4726.66,"prixMoy":4726.66,"prixMax":4726.66},
+{"id":"portail74","designation":"Portail coulissant refoulement droite L4500xH1800mm, RAL 7016 FT, lames 200mm, kit batterie","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":6274.88,"prixMoy":6274.88,"prixMax":6274.88},
+{"id":"portail75","designation":"Portail double battant alu soudé thermolaqué 3m50 H1600mm, lames 200mm, DEA Geko Pro 24V RAL 5023","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":7197.18,"prixMoy":7197.18,"prixMax":7197.18},
+{"id":"portail76","designation":"Portail double battant manuel 3500x1800mm, lames alu horizontales, poteaux alu 180x180mm RAL 7016","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":6481.53,"prixMoy":6481.53,"prixMax":6481.53},
+{"id":"portail77","designation":"Portail coulissant refoulement droite L4200xH1200mm, lames 200mm et 100mm diagonales, DEA Kit 624","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":4880.34,"prixMoy":4880.34,"prixMax":4880.34},
+{"id":"portail78","designation":"Portail coulissant refoulement gauche L2640xH1200mm, rail alu, galets inox, serrure inox","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":3463.83,"prixMoy":3463.83,"prixMax":3463.83},
+{"id":"portillo79","designation":"Portillon battant L990xH1200mm, RAL 7016 FT, serrure inox, poignée inox","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":1591.55,"prixMoy":1591.55,"prixMax":1591.55},
+{"id":"portillo80","designation":"Portillon battant L1000xH2000mm, remplissage idem portail, gâche électrique","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":1769.01,"prixMoy":1769.01,"prixMax":1769.01},
+{"id":"portillo81","designation":"Portillon battant aluminium RAL 7016 FT 1200x1900mm, lames horizontales, gâche électrique","categorie":"Portail et portillons","unite":"ENS","occurrences":1,"prixMin":2497.8,"prixMoy":2497.8,"prixMax":2497.8},
+{"id":"dcapage82","designation":"Décapage surface à haute pression","categorie":"Travaux préparatoires","unite":"ENS","occurrences":2,"prixMin":45.42,"prixMoy":113.55,"prixMax":181.68},
+{"id":"pasjapo83","designation":"Pas japonais dalles ardoise clivée sur assise sablée","categorie":"Maçonnerie paysagère","unite":"u","occurrences":1,"prixMin":55.0,"prixMoy":55.0,"prixMax":55.0},
+{"id":"bicouche84","designation":"Bicouche beige - émulsion bitume gravillonnée 2 couches, gravier 6/10 et finition 4/6","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":15.16,"prixMoy":15.16,"prixMax":15.16},
+{"id":"btond85","designation":"Béton désactivé granulats 6/11 rose de provence, teinté ocre, fibré","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":81.62,"prixMoy":81.62,"prixMax":81.62},
+{"id":"chanett86","designation":"Chaînettes pavés pierre naturelle ou reconstituée sur fondation béton, joints teintés","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":4,"prixMin":45.66,"prixMoy":49.04,"prixMax":50.18},
+{"id":"pavagep87","designation":"Pavage pierre naturelle fondation sable ciment fibré ep.5cm","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":210.02,"prixMoy":210.02,"prixMax":210.02},
+{"id":"terrasse88","designation":"Terrasse grès cérame structure autoportante, dalles 120x30cm ep.20mm R11, double lambourdage alu OMEGA","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":4,"prixMin":188.58,"prixMoy":212.74,"prixMax":252.09},
+{"id":"dallage89","designation":"Dallage céramique ep.20mm format 60x60cm sur plots réglables","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":141.74,"prixMoy":141.74,"prixMax":141.74},
+{"id":"rsineg90","designation":"Résine granulats de marbre - contremarches et parois de murs","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":340.77,"prixMoy":340.77,"prixMax":340.77},
+{"id":"rsineg91","designation":"Résine granulats de marbre - surface horizontale, finition lissée","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":158.77,"prixMoy":158.77,"prixMax":158.77},
+{"id":"rsineg92","designation":"Résine granulats marbre - profilés rives inox, primaire, résine polyuréthane, badigeon","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":93.17,"prixMoy":93.17,"prixMax":93.17},
+{"id":"btond93","designation":"Béton désactivé avec membrane désolidarisation et désactivant biodégradable","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":75.98,"prixMoy":75.98,"prixMax":75.98},
+{"id":"dallage94","designation":"Dallage BETOGREEN C 50x50x10 sur fondation sablée, remplissage gravier gris","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":83.27,"prixMoy":83.27,"prixMax":83.27},
+{"id":"dallesa95","designation":"Dalles alvéolées gravillonnées Eccogravel 30D, gravier palvadeau 8/12","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":30.52,"prixMoy":30.52,"prixMax":30.52},
+{"id":"dallesa96","designation":"Dalles alvéolées gravillonnées Eccogravel 40D, gravier palvadeau 8/12","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":1,"prixMin":35.08,"prixMoy":35.08,"prixMax":35.08},
+{"id":"pavagek97","designation":"Pavage Kahn serie K korten M309 ep.6cm, joints sable polymère","categorie":"Bordures, pavage, dallage","unite":"m2","occurrences":2,"prixMin":164.77,"prixMoy":171.99,"prixMax":179.22},
+{"id":"regardg98","designation":"Regard grille 30x30 classe C250 avec raccordement gouttières","categorie":"Réseaux divers","unite":"u","occurrences":1,"prixMin":250.55,"prixMoy":250.55,"prixMax":250.55},
+{"id":"rservat99","designation":"Réservation Elec - tranchée, fourreau TPC DN50, enrobage sable, remblaiement compactage","categorie":"Réseaux divers","unite":"ENS","occurrences":5,"prixMin":22.66,"prixMoy":425.37,"prixMax":659.59},
+{"id":"misen100","designation":"Mise à niveau ouvrages divers (DEP, regards assainissement, etc.)","categorie":"Réseaux divers","unite":"U","occurrences":5,"prixMin":76.55,"prixMoy":94.85,"prixMax":122.63},
+{"id":"rsineg101","designation":"Résine granulats marbre sur escalier - profilés inox, primaire, résine polyuréthane, badigeon","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":360.74,"prixMoy":360.74,"prixMax":360.74},
+{"id":"rsineg102","designation":"Résine granulats marbre sur murette - profilés inox, primaire, résine polyuréthane, finition lissée","categorie":"Revêtement","unite":"m2","occurrences":1,"prixMin":215.06,"prixMoy":215.06,"prixMax":215.06},
+{"id":"habillag103","designation":"Habillage rives et retombées terrasse - profils de finitions en rive","categorie":"Bordures, pavage, dallage","unite":"ml","occurrences":2,"prixMin":81.0,"prixMoy":84.75,"prixMax":88.49},
+{"id":"terraste104","designation":"Terrasteel en grès cérame 20 mm, dallage 60*60","categorie":"Bordures, pavage, dallage","unite":"m²","occurrences":1,"prixMin":165.0,"prixMoy":0,"prixMax":215.0},
+{"id":"terrasse105","designation":"Terrasse bois exotique Muiracatiara - lambourdage 60x40mm, lames 145x21mm, DTU 51-4","categorie":"Terrasse bois","unite":"m2","occurrences":1,"prixMin":184.48,"prixMoy":184.48,"prixMax":184.48},
+{"id":"terrasse106","designation":"Terrasse bois exotique cumaru, lambourdage 60x40, lames 145x21mm","categorie":"Terrasse bois","unite":"m2","occurrences":1,"prixMin":180.04,"prixMoy":180.04,"prixMax":180.04},
+{"id":"terrasse107","designation":"Terrasse pin classe 4 - lambourdage 65x50, lames 145x27mm vissées, DTU 51-4","categorie":"Terrasse bois","unite":"m2","occurrences":1,"prixMin":134.22,"prixMoy":134.22,"prixMax":134.22},
+{"id":"couched108","designation":"Couche de forme réglage pentes - GNT B 0/20, compactage","categorie":"Terrassement","unite":"m2","occurrences":1,"prixMin":12.98,"prixMoy":12.98,"prixMax":12.98},
+{"id":"dcapage109","designation":"Décapage terre végétale stockée pour réemploi","categorie":"Terrassement","unite":"m2","occurrences":1,"prixMin":5.75,"prixMoy":5.75,"prixMax":5.75},
+{"id":"terrasse110","designation":"Terrassements déblais avec chargement, évacuation décharge agréée","categorie":"Terrassement","unite":"m2","occurrences":1,"prixMin":15.3,"prixMoy":15.3,"prixMax":15.3},
+{"id":"vacuati111","designation":"Évacuation terre végétale excédentaire","categorie":"Terrassement","unite":"m3","occurrences":1,"prixMin":94.64,"prixMoy":94.64,"prixMax":94.64},
+{"id":"fournitu112","designation":"Fourniture et pose d'un géotextile anti-contaminant classe 4","categorie":"Terrassement","unite":"m²","occurrences":1,"prixMin":1.5,"prixMoy":0,"prixMax":3.0},
+{"id":"paillage113","designation":"Paillage paillettes ardoise verte 40/70","categorie":"Aménagements paysagers","unite":"m2","occurrences":1,"prixMin":18.5,"prixMoy":18.5,"prixMax":18.5},
+{"id":"engazonn114","designation":"Engazonnement et roulage","categorie":"Aménagements paysagers","unite":"m2","occurrences":2,"prixMin":7.46,"prixMoy":10.62,"prixMax":13.78},
+{"id":"paillage115","designation":"Paillage écorce de pin naturel","categorie":"Aménagements paysagers","unite":"m2","occurrences":2,"prixMin":22.02,"prixMoy":22.02,"prixMax":22.02},
+{"id":"engazonn116","designation":"Engazonnement mécanisé 40g/m2, roulage","categorie":"Aménagements paysagers","unite":"m2","occurrences":1,"prixMin":2.43,"prixMoy":2.43,"prixMax":2.43},
+{"id":"enlveme117","designation":"Enlèvement haie - tronçonnage, dessouchage, évacuation, broyage","categorie":"Travaux préparatoires","unite":"ml","occurrences":1,"prixMin":55.9,"prixMoy":55.9,"prixMax":55.9},
+{"id":"plantati118","designation":"Plantation haie Photinia Red Robin conteneur 35L 150/175","categorie":"Aménagements paysagers","unite":"ml","occurrences":1,"prixMin":71.27,"prixMoy":71.27,"prixMax":71.27},
+{"id":"alimenta119","designation":"Alimentation électrique depuis prise extérieure existante","categorie":"Réseaux divers","unite":"forfait","occurrences":1,"prixMin":110.0,"prixMoy":110.0,"prixMax":110.0}
+];
 
-// Service Worker
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
-window.addEventListener('load', initGoogleAuth);
+const CHAP_LIB = [
+  "Acces et allee",
+  "Arrosage et drainage",
+  "Assainissement",
+  "Bordures",
+  "Cloture et portail",
+  "Demolition et depose",
+  "Eclairage exterieur",
+  "Espaces verts et plantations",
+  "Fondations et maconnerie",
+  "Jardin et paysagement",
+  "Maçonneries paysagères",
+  "Repli de chantier",
+  "Réseaux divers",
+  "Revetement et dallage",
+  "Travaux de terrassement",
+  "Travaux preparatoires",
+  "Travaux sur terrasse",
+  "Vegetalisation"
+];
+
+
+
 </script>
 </body>
 </html>
