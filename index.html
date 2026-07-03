@@ -408,6 +408,7 @@ function showScreen(name) {
   });
   document.getElementById('s-'+name).classList.remove('hidden');
   document.getElementById('tab-'+name).classList.add('active');
+  if(name==='accueil') renderDevisList();
 }
 
 // STEPS
