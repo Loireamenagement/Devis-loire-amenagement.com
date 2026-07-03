@@ -879,7 +879,13 @@ function renderDevisList() {
     return;
   }
   el.innerHTML=devisList.map(function(d){
-    return '<div class="card" style="cursor:pointer;" onclick=\"ouvrirDevis(\"+d.num+")\"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div><div style="font-size:14px;font-weight:600;">'+(d.cli&&d.cli.nom||'-')+'</div><div style="font-size:11px;color:var(--text3);">'+d.num+' · '+fmtDate(d.date1)+'</div></div><div style="text-align:right;flex-shrink:0;"><div style="font-size:18px;font-weight:700;color:var(--vert)">'+fmt((d.t&&d.t.ttc)||0)+' E</div><div style="font-size:11px;color:var(--text3);">TTC</div></div></div></div>';
+    return '<div class="card" style="cursor:pointer;" onclick="ouvrirDevis(\''+d.num+'\')">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
+      +'<div><div style="font-size:14px;font-weight:600;">'+(d.cli&&d.cli.nom||'-')+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);">'+d.num+' · '+fmtDate(d.date1)+'</div></div>'
+      +'<div style="text-align:right;flex-shrink:0;">'
+      +'<div style="font-size:18px;font-weight:700;color:var(--vert)">'+fmt((d.t&&d.t.ttc)||0)+' E</div>'
+      +'<div style="font-size:11px;color:var(--text3);">TTC</div></div></div></div>';
   }).join('');
 }
 function ouvrirDevis(num) {
