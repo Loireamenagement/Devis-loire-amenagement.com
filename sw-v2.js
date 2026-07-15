@@ -1,4 +1,4 @@
-const CACHE = 'la-v5';
+const CACHE = 'la-v6';
 self.addEventListener('install', e => e.waitUntil(
   caches.open(CACHE).then(c => c.addAll(['/app-v2.html','/manifest-v2.json'])).then(() => self.skipWaiting())
 ));
