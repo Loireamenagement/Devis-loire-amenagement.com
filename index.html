@@ -152,27 +152,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 
     <!-- STEP 2 -->
     <div id="step-content-2" class="hidden">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div class="card-title" style="margin:0;">Chapitres</div>
-          <span style="font-size:11px;color:var(--text3);">Tap pour activer</span>
+
+      <!-- ONGLETS -->
+      <div style="display:flex;background:#fff;border-radius:12px;padding:4px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);gap:4px;">
+        <button id="tab2-catalogue" onclick="switchTab2('catalogue')" style="flex:1;padding:10px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;background:var(--vert);color:white;transition:all .2s;">&#128230; Catalogue</button>
+        <button id="tab2-devis" onclick="switchTab2('devis')" style="flex:1;padding:10px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--text3);transition:all .2s;">&#128203; Mon devis <span id="tab2-count" style="background:var(--vertc);color:white;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;display:none;">0</span></button>
+      </div>
+
+      <!-- PANNEAU CATALOGUE -->
+      <div id="panel2-catalogue">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div class="card-title" style="margin:0;">Chapitres</div>
+            <span style="font-size:11px;color:var(--text3);">Tap pour activer</span>
+          </div>
+          <div id="chap-library" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input id="chap-free" type="text" placeholder="Chapitre libre..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;">
+            <button class="btn btn-primary" style="padding:10px 14px;" onclick="addFreeChap()">+Ch</button>
+            <button class="btn" style="padding:10px 14px;background:var(--vertc);color:white;" onclick="addFreeSubChap()">+Sous</button>
+          </div>
         </div>
-        <div id="chap-library" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-        <div style="display:flex;gap:8px;">
-          <input id="chap-free" type="text" placeholder="Chapitre libre..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;">
-          <button class="btn btn-primary" style="padding:10px 14px;" onclick="addFreeChap()">+Ch</button>
-          <button class="btn" style="padding:10px 14px;background:var(--vertc);color:white;" onclick="addFreeSubChap()">+Sous</button>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div class="card-title" style="margin:0;">Prestations</div>
+            <div id="chap-active-badge" style="display:none;font-size:11px;background:rgba(45,110,62,.1);color:#2d6e3e;padding:3px 10px;border-radius:20px;">+ dans: <b id="chap-active-name"></b></div>
+          </div>
+          <input type="text" id="cat-search" placeholder="Rechercher..." oninput="filterCat()" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;margin-bottom:10px;">
+          <div class="cat-filters" id="cat-filters"></div>
+          <div id="cat-list" style="max-height:320px;overflow-y:auto;"></div>
         </div>
       </div>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div class="card-title" style="margin:0;">Prestations</div>
-          <div id="chap-active-badge" style="display:none;font-size:11px;background:rgba(45,110,62,.1);color:#2d6e3e;padding:3px 10px;border-radius:20px;">+ dans: <b id="chap-active-name"></b></div>
+
+      <!-- PANNEAU MON DEVIS -->
+      <div id="panel2-devis" style="display:none;">
+        <div class="card">
+          <div class="card-title">Lignes du devis</div>
+          <div id="lignes-list">
+            <div id="lignes-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Ajoutez des chapitres et prestations depuis l onglet Catalogue</div>
+          </div>
+          <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="addLigneManuelle()">+ Prestation manuelle</button>
         </div>
-        <input type="text" id="cat-search" placeholder="Rechercher..." oninput="filterCat()" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--r2);font-size:14px;outline:none;margin-bottom:10px;">
-        <div class="cat-filters" id="cat-filters"></div>
-        <div id="cat-list" style="max-height:280px;overflow-y:auto;"></div>
+        <div class="totaux" id="totaux-mini"></div>
       </div>
+
+      <!-- FICHE PRESTATION -->
       <div id="prest-fiche" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;">
         <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto;">
           <div style="width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 16px;"></div>
@@ -194,21 +218,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Mon devis</div>
-        <div id="lignes-list">
-          <div id="lignes-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Ajoutez chapitres et prestations</div>
-        </div>
-        <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="addLigneManuelle()">+ Prestation manuelle</button>
-      </div>
-      <div class="totaux" id="totaux-mini"></div>
+
       <div class="btn-row" style="margin-top:12px;">
         <button class="btn btn-secondary" onclick="goStep(1)">Retour</button>
         <button class="btn btn-primary" style="flex:1;" onclick="goStep(3)">Apercu</button>
       </div>
     </div>
 
-    <!-- STEP 3 -->
+        <!-- STEP 3 -->
     <div id="step-content-3" class="hidden">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -436,7 +453,7 @@ function autoSave() {
 // ── STEPS ─────────────────────────────────────────────────────────────
 function goStep(n) {
   if (n > 1) { try { autoSave(); } catch(e) {} }
-  if (n===2) { setTimeout(function(){ buildChapLibrary(); buildCatFilters(); renderCatList(""); updateActiveChapBadge(); }, 50); }
+  if (n===2) { setTimeout(function(){ buildChapLibrary(); buildCatFilters(); renderCatList(""); updateActiveChapBadge(); updateTab2Count(); switchTab2("catalogue"); }, 50); }
   if (n===3) buildApercu();
   if (n===5) { var em=document.getElementById("send-email"); var cl=document.getElementById("cli-email"); if(em&&cl) em.value=cl.value; }
   var stepsEl = document.getElementById("steps");
@@ -497,7 +514,7 @@ function addFreeChap() {
   var c = {id:uid(),type:"chapter",label:val};
   lignes.push(c); activeChapId=c.id;
   document.getElementById("chap-free").value = "";
-  updateActiveChapBadge(); buildChapLibrary(); renderLignes();
+  updateActiveChapBadge(); buildChapLibrary(); renderLignes(); updateTab2Count();
   showToast("Chapitre ajoute");
 }
 function addFreeSubChap() {
@@ -639,6 +656,8 @@ function validerFiche() {
   closeFiche();
   renderLignes();
   try { autoSave(); } catch(e) {}
+  updateTab2Count();
+  switchTab2("devis");
   showToast("Ajoute: " + ficheItem.designation.slice(0,25));
 }
 
@@ -1114,6 +1133,25 @@ function saveApiKey() {
   var v = document.getElementById("api-key-input").value;
   localStorage.setItem("la_apikey", v);
   showToast("Cle API enregistree");
+}
+
+// TAB STEP 2
+function switchTab2(tab) {
+  var isCat = tab === "catalogue";
+  document.getElementById("panel2-catalogue").style.display = isCat ? "block" : "none";
+  document.getElementById("panel2-devis").style.display     = isCat ? "none"  : "block";
+  document.getElementById("tab2-catalogue").style.background = isCat ? "var(--vert)" : "transparent";
+  document.getElementById("tab2-catalogue").style.color      = isCat ? "white" : "var(--text3)";
+  document.getElementById("tab2-devis").style.background     = isCat ? "transparent" : "var(--vert)";
+  document.getElementById("tab2-devis").style.color          = isCat ? "var(--text3)" : "white";
+  if (!isCat) renderLignes();
+}
+function updateTab2Count() {
+  var cnt = document.getElementById("tab2-count");
+  if (!cnt) return;
+  var n = lignes.filter(function(l){return l.type==="prestation";}).length;
+  cnt.textContent = n;
+  cnt.style.display = n > 0 ? "inline" : "none";
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────
