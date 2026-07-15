@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+div.className='ligne-subchap';
+      div.innerHTML=
+        '<span style="font-size:12px;color:#4a9c5a;">#</span>'
+        +'<input value="'+escHtml(l.label)+'" onchange="updLigne(\''+l.id+'\',' +"'\'label\',this.value)"+'" style="flex:1;background:transparent;border:none;font-weight:600;font-size:13px;color:#2d6e3e;font-family:inherit;outline:none;">'
+        +'<button onclick="moveLigne(\''+l.id+'\',-1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↑</button>'
+        +'<button onclick="moveLigne(\''+l.id+'\',1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↓</button>'
+        +'<button onclick="delLigne(\''+l.id+'\')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>';
+      el.appendChild(div); return;<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -614,329 +621,69 @@ function renderLignes() {
     const div=document.createElement('div');
     if(l.type==='chapter') {
       div.className='ligne-chap';
-      div.innerHTML='<span style="font-size:12px;color:#2d6e3e;">##</span><input value="'+escHtml(l.label)+'" onchange="updLigne(\"'+l.id+'\",\"label\",this.value)" style="flex:1;background:transparent;border:none;font-weight:700;font-size:15px;color:#1a3a2a;font-family:inherit;outline:none;"><button onclick="moveLigne(\"'+l.id+'\",-1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;">↑</button><button onclick="moveLigne(\"'+l.id+'\",1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;">↓</button><button onclick="delLigne(\"'+l.id+'\")" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>';
+      const inp=document.createElement('input');
+      inp.value=l.label; inp.style.cssText='flex:1;background:transparent;border:none;font-weight:700;font-size:15px;color:#1a3a2a;font-family:inherit;outline:none;';
+      inp.addEventListener('change',function(){updLigne(l.id,'label',this.value);});
+      const btnU=document.createElement('button'); btnU.textContent='↑'; btnU.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;'; btnU.addEventListener('click',function(){moveLigne(l.id,-1);});
+      const btnD=document.createElement('button'); btnD.textContent='↓'; btnD.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;'; btnD.addEventListener('click',function(){moveLigne(l.id,1);});
+      const btnX=document.createElement('button'); btnX.textContent='✕'; btnX.style.cssText='background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;'; btnX.addEventListener('click',function(){delLigne(l.id);});
+      const span=document.createElement('span'); span.textContent='##'; span.style.cssText='font-size:12px;color:#2d6e3e;';
+      div.style.cssText='background:linear-gradient(to right,rgba(45,110,62,.1),transparent);border-left:4px solid #2d6e3e;border-radius:8px;padding:10px 12px;margin-bottom:4px;display:flex;align-items:center;gap:8px;';
+      div.appendChild(span); div.appendChild(inp); div.appendChild(btnU); div.appendChild(btnD); div.appendChild(btnX);
       el.appendChild(div); return;
     }
     if(l.type==='subchapter') {
       div.className='ligne-subchap';
-      div.innerHTML='<span style="font-size:12px;color:#4a9c5a;">#</span><input value="'+escHtml(l.label)+'" onchange="updLigne(\"'+l.id+'\",\"label\",this.value)" style="flex:1;background:transparent;border:none;font-weight:600;font-size:13px;color:#2d6e3e;font-family:inherit;outline:none;"><button onclick="moveLigne(\"'+l.id+'\",-1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↑</button><button onclick="moveLigne(\"'+l.id+'\",1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↓</button><button onclick="delLigne(\"'+l.id+'\")" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>';
+      const inp=document.createElement('input');
+      inp.value=l.label; inp.style.cssText='flex:1;background:transparent;border:none;font-weight:600;font-size:13px;color:#2d6e3e;font-family:inherit;outline:none;';
+      inp.addEventListener('change',function(){updLigne(l.id,'label',this.value);});
+      const btnU=document.createElement('button'); btnU.textContent='↑'; btnU.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;'; btnU.addEventListener('click',function(){moveLigne(l.id,-1);});
+      const btnD=document.createElement('button'); btnD.textContent='↓'; btnD.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;'; btnD.addEventListener('click',function(){moveLigne(l.id,1);});
+      const btnX=document.createElement('button'); btnX.textContent='✕'; btnX.style.cssText='background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;'; btnX.addEventListener('click',function(){delLigne(l.id);});
+      const span=document.createElement('span'); span.textContent='#'; span.style.cssText='font-size:12px;color:#4a9c5a;';
+      div.style.cssText='background:rgba(74,156,90,.06);border-left:3px solid #4a9c5a;border-radius:8px;padding:8px 12px;margin-bottom:4px;margin-left:16px;display:flex;align-items:center;gap:8px;';
+      div.appendChild(span); div.appendChild(inp); div.appendChild(btnU); div.appendChild(btnD); div.appendChild(btnX);
       el.appendChild(div); return;
     }
+    // Prestation
     div.className='ligne-row';
-    div.innerHTML=
-      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
-      +'<input value="'+escHtml(l.label)+'" onchange="updLigne(\''+l.id+'\',' +'\'label\',this.value)" style="flex:1;background:transparent;border:none;font-weight:500;font-size:13px;font-family:inherit;outline:none;">'
-      +'<button onclick="moveLigne(\''+l.id+'\',-1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↑</button>'
-      +'<button onclick="moveLigne(\''+l.id+'\',1)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;">↓</button>'
-      +'<button onclick="delLigne(\''+l.id+'\')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;">✕</button>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:80px 110px 60px 80px;gap:6px;align-items:center;">'
-      +'<div><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Unite</div>'
-      +'<select oninput="updLigne(\''+l.id+'\',' +'\'unite\',this.value)" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;">'
-      +['m2','ml','u','h','forfait','ENS','m3','kg'].map(u=>'<option'+(u===(l.unite||'u')?' selected':'')+'>'+u+'</option>').join('')
-      +'</select></div>'
-      +'<div><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">P.U. HT</div>'
-      +'<input type="number" value="'+(l.prix||0)+'" min="0" step="0.01" oninput="updLigne(\''+l.id+'\',' +'\'prix\',this.value)" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:right;"></div>'
-      +'<div><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Qte</div>'
-      +'<input type="number" value="'+(l.qte||1)+'" min="0" step="0.5" oninput="updLigne(\''+l.id+'\',' +'\'qte\',this.value)" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;"></div>'
-      +'<div style="text-align:right;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Total</div>'
-      +'<div id="lt-'+l.id+'" style="font-size:14px;font-weight:600;color:#2d6e3e;">'+fmt(l.qte*(l.prix||0))+' E</div></div>'
-      +'</div>'
+    // Label row
+    const rowTop=document.createElement('div'); rowTop.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+    const inpLabel=document.createElement('input'); inpLabel.value=l.label; inpLabel.style.cssText='flex:1;background:transparent;border:none;font-weight:500;font-size:13px;font-family:inherit;outline:none;';
+    inpLabel.addEventListener('change',function(){updLigne(l.id,'label',this.value);});
+    const btnU=document.createElement('button'); btnU.textContent='↑'; btnU.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;'; btnU.addEventListener('click',function(){moveLigne(l.id,-1);});
+    const btnD=document.createElement('button'); btnD.textContent='↓'; btnD.style.cssText='background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;'; btnD.addEventListener('click',function(){moveLigne(l.id,1);});
+    const btnX=document.createElement('button'); btnX.textContent='✕'; btnX.style.cssText='background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;'; btnX.addEventListener('click',function(){delLigne(l.id);});
+    rowTop.appendChild(inpLabel); rowTop.appendChild(btnU); rowTop.appendChild(btnD); rowTop.appendChild(btnX);
+    // Grid row
+    const rowBot=document.createElement('div'); rowBot.style.cssText='display:grid;grid-template-columns:80px 110px 60px 80px;gap:6px;align-items:center;';
+    // Unite
+    const selDiv=document.createElement('div'); selDiv.innerHTML='<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Unite</div>';
+    const sel=document.createElement('select'); sel.style.cssText='width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;';
+    ['m2','ml','u','h','forfait','ENS','m3','kg'].forEach(function(u){const o=document.createElement('option');o.value=u;o.textContent=u;if(u===(l.unite||'u'))o.selected=true;sel.appendChild(o);});
+    sel.addEventListener('change',function(){updLigne(l.id,'unite',this.value);});
+    selDiv.appendChild(sel); rowBot.appendChild(selDiv);
+    // Prix
+    const prixDiv=document.createElement('div'); prixDiv.innerHTML='<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">P.U. HT</div>';
+    const inpPrix=document.createElement('input'); inpPrix.type='number'; inpPrix.value=l.prix||0; inpPrix.min=0; inpPrix.step=0.01;
+    inpPrix.style.cssText='width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:right;';
+    inpPrix.addEventListener('input',function(){updLigne(l.id,'prix',this.value);});
+    prixDiv.appendChild(inpPrix); rowBot.appendChild(prixDiv);
+    // Qte
+    const qteDiv=document.createElement('div'); qteDiv.innerHTML='<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Qte</div>';
+    const inpQte=document.createElement('input'); inpQte.type='number'; inpQte.value=l.qte||1; inpQte.min=0; inpQte.step=0.5;
+    inpQte.style.cssText='width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;';
+    inpQte.addEventListener('input',function(){updLigne(l.id,'qte',this.value);});
+    qteDiv.appendChild(inpQte); rowBot.appendChild(qteDiv);
+    // Total
+    const totDiv=document.createElement('div'); totDiv.style.cssText='text-align:right;';
+    totDiv.innerHTML='<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Total</div>';
+    const totVal=document.createElement('div'); totVal.id='lt-'+l.id; totVal.style.cssText='font-size:14px;font-weight:600;color:#2d6e3e;';
+    totVal.textContent=fmt(l.qte*(l.prix||0))+' E';
+    totDiv.appendChild(totVal); rowBot.appendChild(totDiv);
+    div.appendChild(rowTop); div.appendChild(rowBot);
     el.appendChild(div);
   });
   renderTotaux();
 }
-
-// APERCU
-function buildApercu() {
-  const t=calcTotaux();
-  const tvaRate=document.getElementById('devis-tva').value;
-  const acompteRate=parseInt(document.getElementById('devis-acompte').value||'30');
-  const num=currentDevis?.num||('DEV-'+new Date().getFullYear()+'-'+uid().slice(0,6));
-  const date1=document.getElementById('devis-date').value;
-  const date2=document.getElementById('devis-valid').value;
-  const cli={nom:document.getElementById('cli-nom').value,adresse:document.getElementById('cli-adresse').value,cp:document.getElementById('cli-cp').value,ville:document.getElementById('cli-ville').value,email:document.getElementById('cli-email').value,tel:document.getElementById('cli-tel').value,desc:document.getElementById('cli-desc').value};
-  if(!currentDevis) currentDevis={};
-  Object.assign(currentDevis,{num,date1,date2,cli,lignes:[...lignes],tvaRate,acompteRate,t,sigClient:null});
-  const lignesHtml=lignes.map(function(l){
-    if(l.type==='chapter') return '<div style="background:rgba(45,110,62,.08);border-left:4px solid #2d6e3e;padding:8px 12px;margin:8px 0 4px;font-weight:700;font-size:14px;border-radius:4px;">'+escHtml(l.label)+'</div>';
-    if(l.type==='subchapter') return '<div style="border-left:3px solid #4a9c5a;padding:6px 10px;margin:4px 0 4px 12px;font-weight:600;font-size:13px;color:#2d6e3e;">'+escHtml(l.label)+'</div>';
-    return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;gap:8px;"><div style="flex:1;"><div style="font-size:13px;">'+escHtml(l.label)+'</div><div style="font-size:11px;color:#888;">'+( l.unite||'')+'</div></div><div style="text-align:right;flex-shrink:0;font-size:12px;color:#555;">'+l.qte+' x '+fmt(l.prix||0)+' E<br><b style="color:#1a2e1a;">'+fmt(l.qte*(l.prix||0))+' E</b></div></div>';
-  }).join('');
-  document.getElementById('apercu-content').innerHTML='<div style="border-bottom:2px solid #2d6e3e;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;"><div style="display:flex;align-items:center;gap:10px;"><img src="'+LOGO+'" style="height:48px;"><div><div style="font-size:16px;font-weight:700;color:#2d6e3e;">'+num+'</div><div style="font-size:11px;color:#888;">'+SOC.nom+'</div></div></div><div style="text-align:right;font-size:12px;color:#555;"><div>Emis le '+fmtDate(date1)+'</div><div style="color:#c0392b;">Valable '+fmtDate(date2)+'</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;font-size:13px;"><div><div style="font-size:10px;color:#888;margin-bottom:4px;">EMETTEUR</div><div style="font-weight:700;">'+SOC.nom+'</div><div style="color:#555;">'+SOC.adresse+'</div><div style="color:#555;">'+SOC.tel+'</div></div><div><div style="font-size:10px;color:#888;margin-bottom:4px;">CLIENT</div><div style="font-weight:700;">'+(cli.nom||'-')+'</div><div style="color:#555;">'+(cli.adresse||'')+' '+(cli.cp||'')+' '+(cli.ville||'')+'</div><div style="color:#555;">'+(cli.tel||'')+'</div><div style="color:#3a8fbf;">'+(cli.email||'')+'</div></div></div>'+lignesHtml+'<div style="margin-top:12px;padding-top:10px;border-top:1px solid #eee;"><div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;"><span>Total HT</span><span>'+fmt(t.ht)+' E</span></div><div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #eee;"><span>TVA '+tvaRate+'%</span><span>'+fmt(t.tva)+' E</span></div><div style="display:flex;justify-content:space-between;background:linear-gradient(135deg,#2d6e3e,#4a9c5a);color:white;padding:12px;border-radius:8px;margin-top:8px;"><span>TOTAL TTC</span><span style="font-size:20px;font-weight:700;">'+fmt(t.ttc)+' E</span></div>'+(acompteRate>0?'<div style="display:flex;justify-content:space-between;padding:8px;background:#f0f8f0;border-radius:6px;margin-top:6px;font-size:13px;border-left:3px solid #2d6e3e;"><span>Acompte '+acompteRate+'%</span><span style="font-weight:700;color:#2d6e3e;">'+fmt(t.ttc*acompteRate/100)+' E</span></div>':'')+' </div><div style="margin-top:12px;font-size:11px;color:#aaa;text-align:center;">IBAN: '+SOC.iban+' · BIC: '+SOC.bic+'</div>';
-}
-
-// PRINT
-function buildPrintArea() {
-  if(!currentDevis) return;
-  const t=currentDevis.t;
-  const acompte=t.ttc*(currentDevis.acompteRate||30)/100;
-  const lignesHtml=currentDevis.lignes.map(function(l,i){
-    if(l.type==='chapter') return '<tr><td colspan="5" style="background:#f2f8f3;border-left:4px solid #2d6e3e;padding:9px 14px;font-weight:700;font-size:13px;">'+escHtml(l.label)+'</td></tr>';
-    if(l.type==='subchapter') return '<tr><td colspan="5" style="background:#f7faf3;border-left:3px solid #4a9c5a;padding:7px 14px 7px 20px;font-weight:600;font-size:12px;color:#2d6e3e;">'+escHtml(l.label)+'</td></tr>';
-    return '<tr style="background:'+(i%2===0?'#fafafa':'white')+'"><td style="padding:8px 10px;font-size:12px;">'+escHtml(l.label)+'</td><td style="padding:8px;text-align:right;font-size:11px;color:#888;">'+(l.unite||'')+'</td><td style="padding:8px;text-align:right;font-size:12px;">'+l.qte+'</td><td style="padding:8px;text-align:right;font-size:12px;">'+fmt(l.prix||0)+' E</td><td style="padding:8px;text-align:right;font-size:12px;font-weight:600;">'+fmt(l.qte*(l.prix||0))+' E</td></tr>';
-  }).join('');
-  document.getElementById('print-area').innerHTML='<div style="padding:36px;font-family:Arial,sans-serif;color:#1a2e1a;max-width:800px;margin:0 auto;"><div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a,#3a8fbf);border-radius:8px;padding:16px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:14px;"><img src="'+LOGO+'" style="height:54px;border-radius:4px;background:white;padding:3px;"><div><div style="color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.2em;">DEVIS ESTIMATIF</div><div style="color:white;font-size:20px;font-weight:700;">'+currentDevis.num+'</div></div></div><div style="text-align:right;color:white;font-size:12px;"><div>Emis le '+fmtDate(currentDevis.date1)+'</div><div style="color:#ffd0d0;">Valable '+fmtDate(currentDevis.date2)+'</div></div></div><div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:16px;margin-bottom:24px;"><div><div style="font-size:10px;letter-spacing:.15em;color:#888;font-weight:600;margin-bottom:6px;">EMETTEUR</div><div style="font-weight:700;font-size:14px;">'+SOC.nom+'</div><div style="font-size:12px;color:#555;margin-top:2px;">'+SOC.adresse+'</div><div style="font-size:12px;color:#555;">Tel: '+SOC.tel+'</div><div style="font-size:12px;color:#3a8fbf;">'+SOC.email+'</div><div style="font-size:10px;color:#aaa;margin-top:4px;">SIRET '+SOC.siret+'</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="flex:1;width:1px;background:#eee;"></div><img src="'+QR+'" style="width:48px;height:48px;border-radius:4px;"><div style="font-size:8px;color:#bbb;text-align:center;">AVIS</div><div style="flex:1;width:1px;background:#eee;"></div></div><div><div style="font-size:10px;letter-spacing:.15em;color:#888;font-weight:600;margin-bottom:6px;">CLIENT</div><div style="font-weight:700;font-size:14px;">'+(currentDevis.cli.nom||'-')+'</div><div style="font-size:12px;color:#555;">'+(currentDevis.cli.adresse||'')+' '+(currentDevis.cli.cp||'')+' '+(currentDevis.cli.ville||'')+'</div><div style="font-size:12px;color:#555;">'+(currentDevis.cli.tel||'')+'</div><div style="font-size:12px;color:#3a8fbf;">'+(currentDevis.cli.email||'')+'</div></div></div><table style="width:100%;border-collapse:collapse;margin-bottom:20px;"><thead><tr style="background:linear-gradient(to right,#2d6e3e,#4a9c5a);color:white;"><th style="padding:10px;text-align:left;font-size:11px;">DESIGNATION</th><th style="padding:10px;text-align:right;font-size:11px;">UNITE</th><th style="padding:10px;text-align:right;font-size:11px;">QTE</th><th style="padding:10px;text-align:right;font-size:11px;">P.U. HT</th><th style="padding:10px;text-align:right;font-size:11px;">TOTAL HT</th></tr></thead><tbody>'+lignesHtml+'</tbody></table><div style="display:flex;justify-content:flex-end;margin-bottom:24px;"><div style="width:280px;"><div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:13px;"><span>Total HT</span><span>'+fmt(t.ht)+' E</span></div><div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:13px;"><span>TVA '+currentDevis.tvaRate+'%</span><span>'+fmt(t.tva)+' E</span></div><div style="display:flex;justify-content:space-between;background:linear-gradient(135deg,#2d6e3e,#4a9c5a);color:white;padding:12px;border-radius:6px;margin-top:6px;"><span>TOTAL TTC</span><span style="font-size:18px;font-weight:700;">'+fmt(t.ttc)+' E</span></div>'+(currentDevis.acompteRate>0?'<div style="display:flex;justify-content:space-between;padding:8px;background:#f0f8f0;border-radius:6px;margin-top:6px;font-size:12px;border-left:3px solid #2d6e3e;"><span>Acompte '+currentDevis.acompteRate+'%</span><span style="font-weight:700;color:#2d6e3e;">'+fmt(acompte)+' E</span></div>':'')+' </div></div><div style="margin-bottom:20px;padding:14px;background:#f5f0e8;border-radius:8px;"><div style="font-size:10px;letter-spacing:.15em;color:#8a7a5a;margin-bottom:8px;">MODALITES DE REGLEMENT</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px;color:#666;line-height:1.8;"><div><div>IBAN: '+SOC.iban+'</div><div>BIC: '+SOC.bic+'</div></div><div><div>Acompte commande: <b style="color:#2d6e3e;">'+fmt(acompte)+' E TTC</b></div><div>Solde reception: <b>'+fmt(t.ttc-acompte)+' E TTC</b></div></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;"><div style="border:1px dashed #ddd;border-radius:8px;padding:16px;min-height:80px;"><div style="font-size:10px;letter-spacing:.1em;color:#8a7a5a;margin-bottom:8px;">BON POUR ACCORD - CLIENT</div>'+(currentDevis.sigClient?'<img src="'+currentDevis.sigClient+'" style="max-height:70px;max-width:100%;">' : '<div style="height:60px;"></div>')+'</div><div style="border:1px solid #e0ead8;border-radius:8px;padding:16px;min-height:80px;background:#fafcf8;"><div style="font-size:10px;letter-spacing:.1em;color:#8a7a5a;margin-bottom:8px;">SIGNATURE LOIRE AMENAGEMENT</div><img src="'+SIG_LA+'" style="max-height:70px;max-width:100%;object-fit:contain;"></div></div><div style="border-top:2px solid #2d6e3e;padding-top:12px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:10px;"><img src="'+LOGO+'" style="height:28px;"><div style="font-size:10px;color:#aaa;line-height:1.6;"><div>'+SOC.adresse+'</div><div>'+SOC.tel+' - '+SOC.email+'</div></div></div><img src="'+QR+'" style="width:36px;height:36px;border-radius:3px;"></div></div>';
-}
-
-// SIGNATURE
-let sigCtx=null;
-function openSigOverlay() {
-  const overlay=document.getElementById('sig-overlay');
-  overlay.style.display='flex';
-  overlay.style.pointerEvents='all';
-  document.body.style.overflow='hidden';
-  setTimeout(function(){
-    const canvas=document.getElementById('sig-canvas');
-    const container=canvas.parentElement;
-    canvas.width=container.clientWidth;
-    canvas.height=container.clientHeight;
-    sigCtx=canvas.getContext('2d');
-    sigCtx.strokeStyle='#1a2e1a';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
-    sigCtx.clearRect(0,0,canvas.width,canvas.height);
-    sigData=null;
-    attachSigEvents(canvas);
-  },100);
-}
-function closeSigOverlay(save) {
-  if(save) {
-    const canvas=document.getElementById('sig-canvas');
-    if(canvas) sigData=canvas.toDataURL('image/png');
-    const prev=document.getElementById('sig-preview');
-    const img=document.getElementById('sig-preview-img');
-    if(prev&&img&&sigData) { img.src=sigData; prev.style.display='block'; }
-    if(currentDevis) currentDevis.sigClient=sigData;
-    showToast('Signature enregistree');
-  }
-  const overlay=document.getElementById('sig-overlay');
-  overlay.style.display='none';
-  overlay.style.pointerEvents='none';
-  document.body.style.overflow='';
-}
-function attachSigEvents(canvas) {
-  const newCanvas=canvas.cloneNode(true);
-  canvas.parentNode.replaceChild(newCanvas,canvas);
-  sigCtx=newCanvas.getContext('2d');
-  sigCtx.strokeStyle='#1a2e1a';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
-  let drawing=false,lastX=0,lastY=0;
-  function pos(e) {
-    const r=newCanvas.getBoundingClientRect();
-    const t=e.touches?e.touches[0]:e;
-    return [(t.clientX-r.left)*(newCanvas.width/r.width),(t.clientY-r.top)*(newCanvas.height/r.height)];
-  }
-  newCanvas.addEventListener('mousedown',function(e){ drawing=true; const p=pos(e); lastX=p[0]; lastY=p[1]; });
-  newCanvas.addEventListener('mousemove',function(e){ if(!drawing) return; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(p[0],p[1]); sigCtx.stroke(); lastX=p[0]; lastY=p[1]; });
-  newCanvas.addEventListener('mouseup',function(){ drawing=false; });
-  newCanvas.addEventListener('touchstart',function(e){ e.preventDefault(); e.stopPropagation(); drawing=true; const p=pos(e); lastX=p[0]; lastY=p[1]; },{passive:false});
-  newCanvas.addEventListener('touchmove',function(e){ e.preventDefault(); e.stopPropagation(); if(!drawing) return; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(lastX,lastY); sigCtx.lineTo(p[0],p[1]); sigCtx.stroke(); lastX=p[0]; lastY=p[1]; },{passive:false});
-  newCanvas.addEventListener('touchend',function(e){ e.preventDefault(); drawing=false; },{passive:false});
-}
-function clearSig() {
-  const canvas=document.getElementById('sig-canvas');
-  if(canvas&&sigCtx) sigCtx.clearRect(0,0,canvas.width,canvas.height);
-  sigData=null;
-}
-
-// RDV GOOGLE AGENDA
-const GOOGLE_CLIENT_ID='439283325349-qkeq67cv9qjuh9olsbq19qpt1db9hu8m.apps.googleusercontent.com';
-const GCAL_SCOPE='https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.send';
-function initGoogleAuth() {
-  if(typeof google==='undefined'||!google.accounts) { setTimeout(initGoogleAuth,300); return; }
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:GOOGLE_CLIENT_ID, scope:GCAL_SCOPE,
-    callback:function(resp) {
-      if(resp&&resp.access_token) {
-        gAccessToken=resp.access_token;
-        fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{'Authorization':'Bearer '+gAccessToken}}).then(function(r){return r.json();}).then(function(d){gUserEmail=d.email;}).catch(function(){});
-        renderRdvModalState(); fetchRdvs();
-      } else { showRdvError('Connexion refusee.'); }
-    },
-    error_callback:function(err) { showRdvError('Erreur Google: '+(err&&err.type?err.type:'inconnue')); }
-  });
-  gisReady=true;
-}
-function openRdvModal() {
-  document.getElementById('rdv-modal').classList.add('open');
-  renderRdvModalState();
-}
-function closeRdvModal() { document.getElementById('rdv-modal').classList.remove('open'); }
-function renderRdvModalState() {
-  const content=document.getElementById('rdv-content');
-  if(gAccessToken) {
-    content.innerHTML='<div style="text-align:center;padding:16px;"><button class="btn btn-blue btn-full" onclick="fetchRdvs()">Voir mes RDV (30 jours)</button><div style="margin-top:8px;font-size:11px;color:var(--text3);">v3</div></div>';
-  } else {
-    content.innerHTML='<div style="text-align:center;padding:16px;"><div style="font-size:36px;margin-bottom:12px;">📅</div><div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Connectez votre Google Agenda</div><button class="btn btn-blue btn-full" onclick="connectGoogle()">Se connecter avec Google</button></div>';
-  }
-}
-function showRdvError(msg) {
-  document.getElementById('rdv-content').innerHTML='<div style="text-align:center;padding:16px;"><div style="color:#e53935;font-size:13px;margin-bottom:12px;">'+msg+'</div><button class="btn btn-blue btn-full" onclick="connectGoogle()">Reessayer</button></div>';
-}
-function connectGoogle() {
-  if(!gisReady||!tokenClient) { showRdvError('Patientez et reessayez.'); return; }
-  document.getElementById('rdv-content').innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);">Ouverture de la fenetre Google...</div>';
-  tokenClient.requestAccessToken({prompt:'consent'});
-}
-async function fetchRdvs() {
-  const content=document.getElementById('rdv-content');
-  content.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);">Chargement...</div>';
-  const now=new Date().toISOString();
-  const end=new Date(Date.now()+30*86400000).toISOString();
-  try {
-    const controller=new AbortController();
-    const timeoutId=setTimeout(function(){controller.abort();},8000);
-    const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin='+encodeURIComponent(now)+'&timeMax='+encodeURIComponent(end)+'&singleEvents=true&orderBy=startTime&maxResults=25',{headers:{'Authorization':'Bearer '+gAccessToken},signal:controller.signal});
-    clearTimeout(timeoutId);
-    if(res.status===401) { gAccessToken=null; showRdvError('Session expiree.'); return; }
-    if(!res.ok) { showRdvError('Erreur API ('+res.status+')'); return; }
-    const data=await res.json();
-    const events=(data.items||[]).filter(function(e){return e.summary;});
-    if(!events.length) { content.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);">Aucun RDV dans les 30 prochains jours.</div>'; return; }
-    window._rdvList=events;
-    content.innerHTML=events.map(function(e,i){
-      const start=e.start&&(e.start.dateTime||e.start.date)||'';
-      return '<div class="cat-item" onclick="pickRdv('+i+')"><div style="flex:1;min-width:0;"><div class="cat-item-name">'+escHtml(e.summary||'')+'</div>'+(e.location?'<div class="cat-item-cat">'+escHtml(e.location)+'</div>':'')+' </div><div style="text-align:right;font-size:11px;color:var(--bleu);">'+( start?fmtDate(start):'')+' </div></div>';
-    }).join('');
-  } catch(e) {
-    const msg=e.name==='AbortError'?'Timeout (8s).':'Erreur: '+e.message;
-    showRdvError(msg);
-  }
-}
-function pickRdv(i) {
-  const e=window._rdvList[i];
-  if(!e) return;
-  let nom=(e.summary||'').replace(/rdv\s*/i,'').replace(/Loire\s*Am[eé]nagement\s*\(?/i,'').replace(/\)$/,'').trim();
-  const loc=e.location||'';
-  const parts=loc.split(',').map(function(s){return s.trim();});
-  let adresse=parts[0]||'',cp='',ville='';
-  const m=(parts[1]||'').match(/^(\d{5})\s+(.+)$/);
-  if(m){cp=m[1];ville=m[2];} else {ville=parts[1]||'';}
-  const raw=(e.description||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
-  const telM=raw.match(/0[67]\d{8}|0[1-9](?:[\s.-]?\d{2}){4}/);
-  const emailM=raw.match(/[\w.-]+@[\w.-]+\.\w+/);
-  const tel=telM?telM[0].replace(/[\s.-]/g,''):'';
-  let email=emailM?emailM[0]:'';
-  if(!email&&e.attendees) { const att=e.attendees.find(function(a){return a.email&&!a.email.includes('loire-amenagement');}); if(att) email=att.email; }
-  document.getElementById('cli-nom').value=nom;
-  document.getElementById('cli-adresse').value=adresse;
-  document.getElementById('cli-cp').value=cp;
-  document.getElementById('cli-ville').value=ville;
-  if(email) document.getElementById('cli-email').value=email;
-  if(tel) document.getElementById('cli-tel').value=tel;
-  closeRdvModal();
-  showToast('RDV importe: '+nom);
-}
-
-// ENVOI GMAIL
-async function envoyerDevis() {
-  if(currentDevis) currentDevis.sigClient=sigData;
-  const email=document.getElementById('send-email').value.trim();
-  const msg=document.getElementById('send-msg').value||'Veuillez trouver ci-dessous votre devis.';
-  const statusEl=document.getElementById('send-status');
-  if(!email) { showToast('Entrez un email client'); return; }
-  if(!gAccessToken) { statusEl.innerHTML='<span style="color:#e53935;">Connectez-vous via Agenda Google a l etape 1.</span>'; return; }
-  statusEl.textContent='Envoi en cours...';
-  try {
-    const subject='Devis Loire Amenagement - '+(currentDevis&&currentDevis.num||'');
-    const lignesHtml=(currentDevis&&currentDevis.lignes||[]).map(function(l){
-      if(l.type==='chapter') return '<tr><td colspan="5" style="background:#f2f8f3;border-left:4px solid #2d6e3e;padding:8px 12px;font-weight:700;font-size:13px;">'+escHtml(l.label)+'</td></tr>';
-      if(l.type==='subchapter') return '<tr><td colspan="5" style="background:#f7faf3;border-left:3px solid #4a9c5a;padding:6px 12px 6px 20px;font-weight:600;font-size:12px;color:#2d6e3e;">'+escHtml(l.label)+'</td></tr>';
-      return '<tr style="border-bottom:1px solid #eee;"><td style="padding:8px 10px;font-size:12px;">'+escHtml(l.label)+'</td><td style="padding:8px;text-align:center;font-size:11px;color:#888;">'+(l.unite||'')+'</td><td style="padding:8px;text-align:right;font-size:12px;">'+l.qte+'</td><td style="padding:8px;text-align:right;font-size:12px;">'+fmt(l.prix||0)+' E</td><td style="padding:8px;text-align:right;font-size:12px;font-weight:600;">'+fmt(l.qte*(l.prix||0))+' E</td></tr>';
-    }).join('');
-    const t=currentDevis&&currentDevis.t||{ht:0,tva:0,ttc:0};
-    const htmlBody='<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#333;margin:0;padding:0;"><div style="max-width:700px;margin:0 auto;padding:20px;"><div style="background:linear-gradient(135deg,#2d6e3e,#4a9c5a);padding:20px 24px;border-radius:8px 8px 0 0;"><div style="color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.15em;">DEVIS ESTIMATIF</div><div style="color:white;font-size:20px;font-weight:700;">'+(currentDevis&&currentDevis.num||'')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;background:#f9fafb;border:1px solid #eee;border-top:none;"><div><div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">EMETTEUR</div><div style="font-weight:700;">'+SOC.nom+'</div><div style="font-size:12px;color:#555;">'+SOC.adresse+'</div><div style="font-size:12px;color:#3a8fbf;">'+SOC.email+'</div></div><div><div style="font-size:10px;letter-spacing:.1em;color:#888;margin-bottom:6px;">CLIENT</div><div style="font-weight:700;">'+escHtml((currentDevis&&currentDevis.cli&&currentDevis.cli.nom)||'-')+'</div><div style="font-size:12px;color:#555;">'+escHtml((currentDevis&&currentDevis.cli&&currentDevis.cli.adresse)||'')+' '+(currentDevis&&currentDevis.cli&&currentDevis.cli.cp||'')+' '+escHtml((currentDevis&&currentDevis.cli&&currentDevis.cli.ville)||'')+'</div></div></div><div style="padding:16px 20px;background:#fff;border:1px solid #eee;border-top:none;"><p>Bonjour '+escHtml((currentDevis&&currentDevis.cli&&currentDevis.cli.nom)||'')+',</p><p style="margin-top:8px;">'+escHtml(msg)+'</p></div><table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-top:none;"><thead><tr style="background:#2d6e3e;color:white;"><th style="padding:10px;text-align:left;font-size:11px;">DESIGNATION</th><th style="padding:10px;text-align:center;font-size:11px;">UNITE</th><th style="padding:10px;text-align:right;font-size:11px;">QTE</th><th style="padding:10px;text-align:right;font-size:11px;">P.U. HT</th><th style="padding:10px;text-align:right;font-size:11px;">TOTAL HT</th></tr></thead><tbody>'+lignesHtml+'</tbody></table><div style="padding:16px 20px;background:#f9fafb;border:1px solid #eee;border-top:none;display:flex;justify-content:flex-end;"><div style="width:280px;"><div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>Total HT</span><span>'+fmt(t.ht)+' E</span></div><div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;font-size:13px;"><span>TVA '+(currentDevis&&currentDevis.tvaRate||10)+'%</span><span>'+fmt(t.tva)+' E</span></div><div style="display:flex;justify-content:space-between;background:#2d6e3e;color:white;padding:12px;border-radius:6px;margin-top:6px;"><span>TOTAL TTC</span><span style="font-size:18px;font-weight:700;">'+fmt(t.ttc)+' E</span></div></div></div><div style="padding:14px 20px;background:#f5f0e8;border:1px solid #eee;border-top:none;font-size:12px;color:#666;"><div style="font-weight:600;color:#8a7a5a;letter-spacing:.1em;font-size:10px;margin-bottom:6px;">REGLEMENT</div><div>IBAN: '+SOC.iban+' · BIC: '+SOC.bic+'</div></div>'+(sigData?'<div style="padding:14px 20px;background:#fff;border:1px solid #eee;border-top:none;"><div style="font-size:10px;color:#888;margin-bottom:8px;">SIGNATURE CLIENT</div><img src="'+sigData+'" style="max-height:80px;max-width:200px;"></div>':'')+' <div style="padding:14px 20px;background:#eee;border-radius:0 0 8px 8px;font-size:11px;color:#666;border:1px solid #ddd;border-top:none;"><strong>'+SOC.nom+'</strong> · '+SOC.adresse+' · '+SOC.tel+'</div></div></body></html>';
-    const htmlBase64=btoa(unescape(encodeURIComponent(htmlBody)));
-    const rawEmail=['From: Loire Amenagement <'+(gUserEmail||'me')+'>','To: '+email,'Subject: =?UTF-8?B?'+btoa(unescape(encodeURIComponent(subject)))+'?=','MIME-Version: 1.0','Content-Type: text/html; charset=UTF-8','Content-Transfer-Encoding: base64','',htmlBase64].join('\r\n');
-    const encodedEmail=btoa(unescape(encodeURIComponent(rawEmail))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-    const res=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send',{method:'POST',headers:{'Authorization':'Bearer '+gAccessToken,'Content-Type':'application/json'},body:JSON.stringify({raw:encodedEmail})});
-    if(!res.ok) { const err=await res.json(); throw new Error(err.error&&err.error.message||'Erreur Gmail '+res.status); }
-    statusEl.innerHTML='<span style="color:#2d6e3e;font-weight:600;">Email envoye depuis votre Gmail !</span>';
-    sauvegarderDevis();
-  } catch(e) {
-    statusEl.innerHTML='<span style="color:#e53935;">Erreur: '+e.message+'</span>';
-  }
-}
-function imprimerDevis() {
-  if(currentDevis) currentDevis.sigClient=sigData;
-  buildPrintArea();
-  window.print();
-}
-
-// SAUVEGARDE
-function sauvegarderDevis() {
-  if(!currentDevis) { showToast('Completez le devis avant de sauvegarder'); return; }
-  if(currentDevis) currentDevis.sigClient=sigData;
-  currentDevis.savedAt=new Date().toISOString();
-  devisList=devisList.filter(function(d){return d.num!==currentDevis.num;});
-  devisList.unshift(currentDevis);
-  localStorage.setItem('la_devis',JSON.stringify(devisList));
-  renderDevisList();
-  showToast('Devis sauvegarde');
-}
-function renderDevisList() {
-  const el=document.getElementById('devis-list');
-  if(!el) return;
-  if(!devisList.length) {
-    el.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--text3);"><div style="font-size:48px;margin-bottom:12px;">📋</div><div>Aucun devis</div><div style="font-size:12px;margin-top:6px;">Cliquez + Devis pour commencer</div></div>';
-    return;
-  }
-  el.innerHTML=devisList.map(function(d){
-    return '<div class="card" style="cursor:pointer;" onclick="ouvrirDevis(\''+d.num+'\')">'
-      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
-      +'<div><div style="font-size:14px;font-weight:600;">'+(d.cli&&d.cli.nom||'-')+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);">'+d.num+' · '+fmtDate(d.date1)+'</div></div>'
-      +'<div style="text-align:right;flex-shrink:0;">'
-      +'<div style="font-size:18px;font-weight:700;color:var(--vert)">'+fmt((d.t&&d.t.ttc)||0)+' E</div>'
-      +'<div style="font-size:11px;color:var(--text3);">TTC</div></div></div></div>';
-  }).join('');
-}
-function ouvrirDevis(num) {
-  const d=devisList.find(function(x){return x.num===num;});
-  if(!d) return;
-  currentDevis=d; lignes=[...d.lignes]; sigData=d.sigClient||null;
-  document.getElementById('cli-nom').value=d.cli.nom||'';
-  document.getElementById('cli-adresse').value=d.cli.adresse||'';
-  document.getElementById('cli-cp').value=d.cli.cp||'';
-  document.getElementById('cli-ville').value=d.cli.ville||'';
-  document.getElementById('cli-email').value=d.cli.email||'';
-  document.getElementById('cli-tel').value=d.cli.tel||'';
-  document.getElementById('cli-desc').value=d.cli.desc||'';
-  document.getElementById('devis-tva').value=d.tvaRate||'10';
-  document.getElementById('devis-acompte').value=d.acompteRate||'30';
-  showScreen('nouveau');
-  renderLignes();
-  goStep(3);
-}
-function nouveauDevis() {
-  lignes=[]; sigData=null; currentDevis=null; activeChapId=null;
-  ['cli-nom','cli-adresse','cli-cp','cli-ville','cli-email','cli-tel','cli-desc','send-msg'].forEach(function(id){
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  document.getElementById('devis-acompte').value='30';
-  document.getElementById('devis-tva').value='10';
-  document.getElementById('send-status').textContent='';
-  const today=new Date().toISOString().split('T')[0];
-  const in15=new Date(Date.now()+15*86400000).toISOString().split('T')[0];
-  document.getElementById('devis-date').value=today;
-  document.getElementById('devis-valid').value=in15;
-  const prev=document.getElementById('sig-preview');
-  if(prev) prev.style.display='none';
-  renderLignes();
-  showScreen('nouveau');
-  goStep(1);
-}
-
-// PARAMETRES
-function saveApiKey() { localStorage.setItem('la_apikey',document.getElementById('api-key-input').value); showToast('Cle API enregistree'); }
-// UTILS
-function fmt(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}catch(e){return d;}}
-function uid(){return Math.random().toString(36).slice(2,10).toUpperCase();}
-function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
-
-window.addEventListener('load', initGoogleAuth);
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw-v2.js').catch(function(){});
-
-</script>
-</body>
-</html>
+>
