@@ -1,4 +1,4 @@
-const CACHE = 'la-v7';
+const CACHE = 'la-v8';
 const BASE = '/Devis-loire-amenagement.com';
 
 self.addEventListener('install', e => e.waitUntil(
