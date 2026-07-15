@@ -382,7 +382,44 @@ function initApp() {
   buildFullCatFilters();
   renderFullCatList("","");
   renderDevisList();
+  // Option B: restore draft if exists
+  var draft = localStorage.getItem("la_draft");
+  if (draft) {
+    try {
+      var d = JSON.parse(draft);
+      if (d && d.draft && d.lignes && d.lignes.length > 0) {
+        // Show banner to restore
+        var banner = document.createElement("div");
+        banner.style.cssText = "position:fixed;bottom:70px;left:16px;right:16px;background:#2d6e3e;color:white;padding:12px 16px;border-radius:12px;z-index:800;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.2);";
+        banner.innerHTML = "<div style="font-size:13px;"><b>Brouillon</b> &bull; " + escHtml(d.cli&&d.cli.nom||"Sans nom") + " &bull; " + d.lignes.filter(function(l){return l.type==="prestation";}).length + " prestation(s)</div><div style="display:flex;gap:8px;"><button onclick="restoreDraft()" style="background:white;color:#2d6e3e;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Reprendre</button><button onclick="this.parentElement.parentElement.remove();localStorage.removeItem('la_draft')" style="background:rgba(255,255,255,.2);color:white;border:none;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;">Ignorer</button></div>";
+        document.body.appendChild(banner);
+        window._pendingDraft = d;
+      }
+    } catch(e) {}
+  }
   showScreen("accueil");
+}
+
+function restoreDraft() {
+  var d = window._pendingDraft;
+  if (!d) return;
+  currentDevis = d;
+  lignes = d.lignes.slice();
+  sigData = d.sigClient || null;
+  document.getElementById("cli-nom").value     = d.cli.nom||"";
+  document.getElementById("cli-adresse").value = d.cli.adresse||"";
+  document.getElementById("cli-cp").value      = d.cli.cp||"";
+  document.getElementById("cli-ville").value   = d.cli.ville||"";
+  document.getElementById("cli-email").value   = d.cli.email||"";
+  document.getElementById("cli-tel").value     = d.cli.tel||"";
+  document.getElementById("cli-desc").value    = d.cli.desc||"";
+  var tvaEl = document.getElementById("devis-tva"); if(tvaEl) tvaEl.value=d.tvaRate||"10";
+  var acEl  = document.getElementById("devis-acompte"); if(acEl) acEl.value=d.acompteRate||"30";
+  document.querySelectorAll("[style*='position:fixed'][style*='background:#2d6e3e']").forEach(function(el){el.remove();});
+  showScreen("nouveau");
+  renderLignes();
+  goStep(2);
+  showToast("Brouillon restaure");
 }
 
 // ── SCREENS ───────────────────────────────────────────────────────────
@@ -397,7 +434,44 @@ function showScreen(name) {
 }
 
 // ── STEPS ─────────────────────────────────────────────────────────────
+function autoSave() {
+  if (!currentDevis && !lignes.length) return;
+  // Build minimal currentDevis snapshot
+  var tvaEl = document.getElementById("devis-tva");
+  var acEl  = document.getElementById("devis-acompte");
+  var snap = {
+    num:    (currentDevis && currentDevis.num) || ("DEV-"+new Date().getFullYear()+"-"+uid().slice(0,6)),
+    date1:  (document.getElementById("devis-date")||{}).value||"",
+    date2:  (document.getElementById("devis-valid")||{}).value||"",
+    tvaRate:  tvaEl ? tvaEl.value : "10",
+    acompteRate: acEl ? parseInt(acEl.value)||30 : 30,
+    cli: {
+      nom:     (document.getElementById("cli-nom")||{}).value||"",
+      adresse: (document.getElementById("cli-adresse")||{}).value||"",
+      cp:      (document.getElementById("cli-cp")||{}).value||"",
+      ville:   (document.getElementById("cli-ville")||{}).value||"",
+      email:   (document.getElementById("cli-email")||{}).value||"",
+      tel:     (document.getElementById("cli-tel")||{}).value||"",
+      desc:    (document.getElementById("cli-desc")||{}).value||"",
+    },
+    lignes: lignes.slice(),
+    t: calcTotaux(),
+    sigClient: sigData||null,
+    savedAt: new Date().toISOString(),
+    draft: true
+  };
+  if (!currentDevis) currentDevis = snap;
+  else Object.assign(currentDevis, snap);
+  devisList = devisList.filter(function(d){return d.num!==currentDevis.num;});
+  devisList.unshift(currentDevis);
+  localStorage.setItem("la_devis", JSON.stringify(devisList));
+  // Also save draft separately for restore on relaunch
+  localStorage.setItem("la_draft", JSON.stringify(currentDevis));
+}
+
 function goStep(n) {
+  // Auto-save on every step change (option C)
+  if (n > 1) autoSave();
   if (n===2) { setTimeout(function(){ buildChapLibrary(); buildCatFilters(); renderCatList(""); updateActiveChapBadge(); }, 50); }
   if (n===3) buildApercu();
   if (n===5) { var em=document.getElementById("send-email"); var cl=document.getElementById("cli-email"); if(em&&cl) em.value=cl.value; }
@@ -600,6 +674,7 @@ function validerFiche() {
   } else { lignes.push(nl); }
   closeFiche();
   renderLignes();
+  autoSave();
   showToast("Ajoute: " + ficheItem.designation.slice(0,25));
 }
 
@@ -1010,9 +1085,11 @@ function sauvegarderDevis() {
   if (!currentDevis) { showToast("Completez le devis avant de sauvegarder"); return; }
   if (currentDevis) currentDevis.sigClient = sigData;
   currentDevis.savedAt = new Date().toISOString();
+  currentDevis.draft = false;
   devisList = devisList.filter(function(d){return d.num!==currentDevis.num;});
   devisList.unshift(currentDevis);
   localStorage.setItem("la_devis", JSON.stringify(devisList));
+  localStorage.removeItem("la_draft");
   renderDevisList();
   showToast("Devis sauvegarde");
 }
@@ -1064,6 +1141,7 @@ function nouveauDevis() {
   var dv=document.getElementById("devis-valid"); if(dv) dv.value=in15;
   var prev=document.getElementById("sig-preview"); if(prev) prev.style.display="none";
   renderLignes();
+  localStorage.removeItem("la_draft");
   showScreen("nouveau");
   goStep(1);
 }
