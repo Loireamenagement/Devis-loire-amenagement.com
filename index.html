@@ -1087,11 +1087,38 @@ function renderDevisList() {
     var card = document.createElement("div");
     card.className = "card";
     card.style.cursor = "pointer";
-    card.innerHTML = "<div style=\"display:flex;justify-content:space-between;align-items:flex-start;gap:8px;\"><div><div style=\"font-size:14px;font-weight:600;\">"+(d.cli&&d.cli.nom||"-")+"</div><div style=\"font-size:11px;color:var(--text3);\">"+d.num+" &middot; "+fmtDate(d.date1)+"</div></div><div style=\"text-align:right;flex-shrink:0;\"><div style=\"font-size:18px;font-weight:700;color:var(--vert)\">"+fmt((d.t&&d.t.ttc)||0)+" E</div><div style=\"font-size:11px;color:var(--text3);\">TTC</div></div></div>";
-    card.addEventListener("click", (function(num){return function(){ouvrirDevis(num);};})(d.num));
+    // Main content - clickable to open
+    var mainDiv = document.createElement("div");
+    mainDiv.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex:1;cursor:pointer;";
+    mainDiv.innerHTML = "<div><div style=\"font-size:14px;font-weight:600;\">"+(d.cli&&d.cli.nom||"-")+"</div><div style=\"font-size:11px;color:var(--text3);\">"+d.num+" &middot; "+fmtDate(d.date1)+(d.draft?" &middot; <i>Brouillon</i>":"")+"</div></div><div style=\"text-align:right;flex-shrink:0;\"><div style=\"font-size:18px;font-weight:700;color:var(--vert)\">"+fmt((d.t&&d.t.ttc)||0)+" E</div><div style=\"font-size:11px;color:var(--text3);\">TTC</div></div>";
+    mainDiv.addEventListener("click", (function(num){return function(){ouvrirDevis(num);};})(d.num));
+    // Delete button
+    var delBtn = document.createElement("button");
+    delBtn.innerHTML = "&#128465;";
+    delBtn.title = "Supprimer ce devis";
+    delBtn.style.cssText = "background:none;border:none;font-size:18px;cursor:pointer;color:#ccc;padding:4px 6px;flex-shrink:0;align-self:center;";
+    delBtn.addEventListener("click", (function(num){return function(e){
+      e.stopPropagation();
+      if (confirm("Supprimer le devis "+num+" ?")) {
+        supprimerDevis(num);
+      }
+    };})(d.num));
+    card.style.cssText = "display:flex;align-items:center;gap:4px;";
+    card.appendChild(mainDiv);
+    card.appendChild(delBtn);
     el.appendChild(card);
   });
 }
+function supprimerDevis(num) {
+  devisList = devisList.filter(function(d){return d.num !== num;});
+  localStorage.setItem("la_devis", JSON.stringify(devisList));
+  // Clear draft if it matches
+  var draft = localStorage.getItem("la_draft");
+  if (draft) { try { var d=JSON.parse(draft); if(d.num===num) localStorage.removeItem("la_draft"); } catch(e){} }
+  renderDevisList();
+  showToast("Devis supprime");
+}
+
 function ouvrirDevis(num) {
   var d = devisList.find(function(x){return x.num===num;});
   if (!d) return;
