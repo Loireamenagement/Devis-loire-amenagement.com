@@ -191,7 +191,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
           <div id="lignes-list">
             <div id="lignes-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Ajoutez des chapitres et prestations depuis l onglet Catalogue</div>
           </div>
-          <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="addLigneManuelle()">+ Prestation manuelle</button>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="addLigneManuelle()">+ Prestation</button>
+          <button class="btn btn-secondary" style="flex:1;background:#fffde7;border-color:#f9a825;color:#b45309;" onclick="addCommentaire()">💬 Note</button>
+        </div>
         </div>
         <div class="totaux" id="totaux-mini"></div>
       </div>
@@ -691,6 +694,11 @@ function addLigneManuelle() {
   lignes.push({id:uid(), type:"prestation", label:"Prestation", unite:"u", qte:1, prix:0});
   renderLignes();
 }
+function addCommentaire() {
+  lignes.push({id:uid(), type:"commentaire", label:""});
+  renderLignes();
+  showToast("Note ajoutee");
+}
 function delLigne(id) { lignes = lignes.filter(function(l){return l.id!==id;}); renderLignes(); }
 function moveLigne(id, dir) {
   var i = lignes.findIndex(function(l){return l.id===id;});
@@ -709,12 +717,12 @@ function updLigne(id, field, val) {
 function calcTotaux() {
   var tvaEl = document.getElementById("devis-tva");
   var tvaRate = tvaEl ? parseInt(tvaEl.value)||10 : 10;
-  var ht = lignes.filter(function(l){return l.type==="prestation";}).reduce(function(s,l){return s+l.qte*l.prix;},0);
+  var ht = lignes.filter(function(l){return l.type==="prestation" && !l.pm;}).reduce(function(s,l){return s+l.qte*l.prix;},0);
   var tva = ht * tvaRate / 100;
   return {ht:ht, tva:tva, ttc:ht+tva};
 }
 function renderTotaux() {
-  lignes.filter(function(l){return l.type==="prestation";}).forEach(function(l){
+  lignes.filter(function(l){return l.type==="prestation" && !l.pm;}).forEach(function(l){
     var el = document.getElementById("lt-"+l.id);
     if (el) el.textContent = fmt(l.qte*(l.prix||0)) + " E";
   });
@@ -764,6 +772,22 @@ function renderLignes() {
       el.appendChild(div); return;
     }
 
+    // Commentaire
+    if (l.type === "commentaire") {
+      div.className = "ligne-row";
+      div.style.cssText = "background:#fffde7;border:1px dashed #f9a825;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;";
+      var ic = document.createElement("span"); ic.textContent="💬"; ic.style.cssText="font-size:14px;flex-shrink:0;margin-top:2px;";
+      var ta = document.createElement("textarea");
+      ta.value = l.label||"";
+      ta.placeholder = "Note / commentaire pour le client...";
+      ta.rows = 2;
+      ta.style.cssText = "flex:1;background:transparent;border:none;font-size:13px;font-family:inherit;outline:none;resize:vertical;color:var(--text2);";
+      ta.addEventListener("change",(function(id){return function(){updLigne(id,"label",this.value);};})(l.id));
+      var bX=mkBtn("✕","#ccc","18px"); bX.addEventListener("click",(function(id){return function(){delLigne(id);};})(l.id));
+      div.appendChild(ic); div.appendChild(ta); div.appendChild(bX);
+      el.appendChild(div); return;
+    }
+
     // Prestation
     div.className = "ligne-row";
     var r1 = document.createElement("div"); r1.style.cssText="display:flex;align-items:center;gap:6px;margin-bottom:6px;";
@@ -795,9 +819,19 @@ function renderLignes() {
     dQ.appendChild(iQ); r2.appendChild(dQ);
 
     var dT=document.createElement("div"); dT.style.cssText="text-align:right;";
-    dT.innerHTML="<div style=\"font-size:10px;color:var(--text3);margin-bottom:2px;\">Total</div>";
-    var tV=document.createElement("div"); tV.id="lt-"+l.id; tV.style.cssText="font-size:14px;font-weight:600;color:#2d6e3e;";
-    tV.textContent=fmt(l.qte*(l.prix||0))+" E";
+    var pmBtn=document.createElement("button");
+    pmBtn.textContent = l.pm ? "PM ✓" : "PM";
+    pmBtn.title = "Pour mémoire (non totalisé)";
+    pmBtn.style.cssText = "font-size:10px;padding:3px 7px;border-radius:10px;border:1px solid "+(l.pm?"#e65100":"var(--border)")+";background:"+(l.pm?"#fff3e0":"transparent")+";color:"+(l.pm?"#e65100":"var(--text3)")+";cursor:pointer;margin-bottom:4px;width:100%;";
+    pmBtn.addEventListener("click",(function(id,btn){return function(){
+      var lg=lignes.find(function(x){return x.id===id;});
+      if(lg){lg.pm=!lg.pm; renderLignes(); renderTotaux();}
+    };})(l.id, pmBtn));
+    dT.appendChild(pmBtn);
+    var tLabel=document.createElement("div"); tLabel.style.cssText="font-size:10px;color:var(--text3);margin-bottom:2px;"; tLabel.textContent="Total";
+    dT.appendChild(tLabel);
+    var tV=document.createElement("div"); tV.id="lt-"+l.id; tV.style.cssText="font-size:14px;font-weight:600;color:"+(l.pm?"#e65100":"#2d6e3e")+";";
+    tV.textContent = l.pm ? "(PM)" : fmt(l.qte*(l.prix||0))+" E";
     dT.appendChild(tV); r2.appendChild(dT);
 
     div.appendChild(r1); div.appendChild(r2);
@@ -837,7 +871,10 @@ function buildApercu() {
   var lh = lignes.map(function(l){
     if (l.type==="chapter")    return "<div style=\"background:rgba(45,110,62,.08);border-left:4px solid #2d6e3e;padding:8px 12px;margin:8px 0 4px;font-weight:700;font-size:14px;border-radius:4px;\">"+escHtml(l.label)+"</div>";
     if (l.type==="subchapter") return "<div style=\"border-left:3px solid #4a9c5a;padding:6px 10px;margin:4px 0 4px 12px;font-weight:600;font-size:13px;color:#2d6e3e;\">"+escHtml(l.label)+"</div>";
-    return "<div style=\"display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;gap:8px;\"><div style=\"flex:1;\"><div style=\"font-size:13px;\">"+escHtml(l.label)+"</div><div style=\"font-size:11px;color:#888;\">"+( l.unite||"")+"</div></div><div style=\"text-align:right;flex-shrink:0;font-size:12px;color:#555;\">"+l.qte+" x "+fmt(l.prix||0)+" E<br><b style=\"color:#1a2e1a;\">"+fmt(l.qte*(l.prix||0))+" E</b></div></div>";
+    if (l.type==="commentaire") return "<div style=\"background:#fffde7;border-left:3px solid #f9a825;padding:6px 10px;margin:4px 0;font-size:12px;color:#555;font-style:italic;border-radius:4px;\">&#128172; "+escHtml(l.label)+"</div>";
+    var pmStyle = l.pm ? "color:#e65100;font-style:italic;" : "";
+    var totalStr = l.pm ? "<span style=\"color:#e65100;font-size:11px;\">(Pour memoire)</span>" : "<b style=\"color:#1a2e1a;\">"+fmt(l.qte*(l.prix||0))+" E</b>";
+    return "<div style=\"display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;gap:8px;\"><div style=\"flex:1;\"><div style=\"font-size:13px;"+pmStyle+"\">"+escHtml(l.label)+"</div><div style=\"font-size:11px;color:#888;\">"+(l.unite||"")+"</div></div><div style=\"text-align:right;flex-shrink:0;font-size:12px;\">"+l.qte+" x "+fmt(l.prix||0)+" E<br>"+totalStr+"</div></div>";
   }).join("");
 
   var ac = document.getElementById("apercu-content");
@@ -866,7 +903,15 @@ function buildPrintArea() {
   var rows = currentDevis.lignes.map(function(l,i){
     if (l.type==="chapter")    return "<tr><td colspan=\"5\" style=\"background:#f2f8f3;border-left:4px solid #2d6e3e;padding:9px 14px;font-weight:700;font-size:13px;\">"+escHtml(l.label)+"</td></tr>";
     if (l.type==="subchapter") return "<tr><td colspan=\"5\" style=\"background:#f7faf3;border-left:3px solid #4a9c5a;padding:7px 14px 7px 20px;font-weight:600;font-size:12px;color:#2d6e3e;\">"+escHtml(l.label)+"</td></tr>";
-    return "<tr style=\"background:"+(i%2===0?"#fafafa":"white")+"\"><td style=\"padding:8px 10px;font-size:12px;\">"+escHtml(l.label)+"</td><td style=\"padding:8px;text-align:right;font-size:11px;color:#888;\">"+(l.unite||"")+"</td><td style=\"padding:8px;text-align:right;font-size:12px;\">"+l.qte+"</td><td style=\"padding:8px;text-align:right;font-size:12px;\">"+fmt(l.prix||0)+" E</td><td style=\"padding:8px;text-align:right;font-size:12px;font-weight:600;\">"+fmt(l.qte*(l.prix||0))+" E</td></tr>";
+    if (l.type==="commentaire") return "<tr><td colspan=\"5\" style=\"background:#fffde7;border-left:3px solid #f9a825;padding:6px 14px;font-size:12px;color:#555;font-style:italic;\">&#128172; "+escHtml(l.label)+"</td></tr>";
+    var pmTot = l.pm ? "(PM)" : fmt(l.qte*(l.prix||0))+" E";
+    var pmStyle2 = l.pm ? "color:#e65100;font-style:italic;" : "";
+    return "<tr style=\"background:"+(i%2===0?"#fafafa":"white")+"\">" +
+      "<td style=\"padding:8px 10px;font-size:12px;"+pmStyle2+"\">"+escHtml(l.label)+"</td>" +
+      "<td style=\"padding:8px;text-align:right;font-size:11px;color:#888;\">"+(l.unite||"")+"</td>" +
+      "<td style=\"padding:8px;text-align:right;font-size:12px;\">"+l.qte+"</td>" +
+      "<td style=\"padding:8px;text-align:right;font-size:12px;\">"+fmt(l.prix||0)+" E</td>" +
+      "<td style=\"padding:8px;text-align:right;font-size:12px;font-weight:600;color:"+(l.pm?"#e65100":"inherit")+";\">"+pmTot+"</td></tr>";
   }).join("");
   document.getElementById("print-area").innerHTML =
     "<div style=\"padding:36px;font-family:Arial,sans-serif;color:#1a2e1a;max-width:800px;margin:0 auto;\">"
